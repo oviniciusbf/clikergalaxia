@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galáxia Clicker</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+
+    <div class="estrela-cadente"></div>
+    <div class="estrela-cadente"></div>
+    <div class="estrela-cadente"></div>
+    <div class="estrela-cadente"></div>
+    <div class="estrela-cadente"></div>
+
+
+    <div class="painel-salvar">
+        <button id="btnSalvar" class="btn btn-salvar">Salvar Jogo</button>
+        <button id="btnReiniciar" class="btn btn-reiniciar">Reiniciar Jogo</button>
+        <p id="mensagem-salvar" class="hidden">Jogo Salvo!</p>
+    </div>
+
+    <div id="telaInicio">
+        <h1>🌌 Bem-vindo ao Galáxia Clicker</h1>
+        <p>Comece sua jornada expandindo sua civilização através da galáxia!</p>
+        <label for="nomeEmpresa">Nome da sua civilização galáctica:</label>
+        <input type="text" id="nomeEmpresa" placeholder="Ex: Nova Orion">
+        <br><br>
+        <button type="button" id="iniciar-jogo-btn" class="btn btn-acao">Explorar o Universo</button>
+    </div>
+
+    <div id="jogo" class="hidden">
+        <h1><span id="tituloEmpresa"></span></h1>
+
+        <div class="painel-status">
+            <p>Energia Cósmica: ⚡ <span id="dinheiro">0</span></p>
+            <p>Renda Automática: <span id="renda-por-segundo">+0/s</span></p>
+            <p>Cliques Totais: <span id="move-counter">0</span></p>
+            <p>Tempo de Jogo: <span id="timer">00:00</span></p>
+            
+            <p class="progresso-titulo">Progresso para a Próxima Era:</p>
+            <progress id="barraExpansao" value="0" max="500"></progress>
+            <span id="progresso-texto">0/500 cliques</span> 
+            
+            <p id="mensagem"></p> 
+        </div>
+
+        <div class="painel-visual">
+            <img id="universo-img" src="imagens/planeta.png" alt="Planeta">
+        </div>
+
+        <div class="painel-upgrades">
+            <h2>Tecnologias e Expansões</h2>
+            
+            <div class="menu-tabs">
+                <button class="tab-button btn btn-upgrade tab-active" onclick="mudarAba('clique-tab', this)">Upgrades de Clique</button>
+                <button class="tab-button btn btn-upgrade" onclick="mudarAba('automatica-tab', this)">Renda Automática</button>
+                <button class="tab-button btn btn-upgrade" onclick="mudarAba('expansao-tab', this)">Expansões</button>
+            </div>
+            
+            <div id="upgrades-container">
+                <div id="clique-tab" class="tab-content"></div>
+                <div id="automatica-tab" class="tab-content hidden"></div>
+                <div id="expansao-tab" class="tab-content hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
