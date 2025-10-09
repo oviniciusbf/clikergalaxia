@@ -1,4 +1,4 @@
-// --- Gerenciamento de Estado do Jogo ---
+
 let gameState = {
     energia: 0,
     energiaPorClique: 1,
@@ -29,8 +29,8 @@ const TEST_CLIQUES_POR_CLIQUE = 10;
 // --- Definição das Eras ---
 const ERAS = [
     { nome: "Planeta Básico", baseCost: 0, costMultiplier: 1.0, imagem: "imagens/planeta.png", cor: "#A6A6A6" },
-    { nome: "Colonização Inicial", baseCost: 1000, costMultiplier: 1.8, imagem: "imagens/colonizacao_inicial.png", cor: "#9400D3" },
-    { nome: "Civilização Avançada", baseCost: 15000, costMultiplier: 2.5, imagem: "imagens/civilizacao_avancada.png", cor: "#1E90FF" },
+    { nome: "Colonização Inicial", baseCost: 50, costMultiplier: 1.8, imagem: "imagens/colonizaçao_inicial.png", cor: "#9400D3" },
+    { nome: "Civilização Avançada", baseCost: 70, costMultiplier: 2.5, imagem: "imagens/civilizaçao_avançada.png", cor: "#1E90FF" },
     { nome: "Domínio Galáctico", baseCost: 150000, costMultiplier: 3.5, imagem: "imagens/dominio_galatico.png", cor: "#FFD700" },
     { nome: "Expansão Intergaláctica", baseCost: 5000000, costMultiplier: 4.0, imagem: "imagens/expansao_intergalactica.png", cor: "#00FF7F" }
 ];
