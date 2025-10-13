@@ -155,14 +155,19 @@ h2 {
     font-size: 1.1em;
 }
 
+.game-main {
+    display: flex;
+    flex-direction: column; /* Para que fiquem um acima do outro */
+    align-items: center;
+    gap: 20px; /* Espaçamento entre o painel de status e o visual */
+    margin-top: 20px;
+}
+
 .painel-status {
-    position: absolute; /* Alterado para absolute */
-    bottom: 10px; /* Ajustado para dentro do painel-visual */
-    right: 10px; /* Ajustado para dentro do painel-visual */
     background: var(--cor-fundo-card);
     border-radius: 12px;
     padding: 15px;
-    width: clamp(200px, 80%, 280px); /* Ajustado para caber dentro do painel-visual */
+    width: clamp(280px, 35vw, 350px);
     box-shadow: 0 0 12px rgba(100, 100, 255, 0.2);
     backdrop-filter: blur(4px);
     display: grid;
@@ -170,35 +175,58 @@ h2 {
     gap: 8px;
     text-align: left;
     animation: float-subtle 6s ease-in-out infinite alternate;
-    z-index: 100; /* Garante que fique acima da imagem */
+    z-index: 100;
     opacity: 0.9;
     transition: opacity 0.3s ease;
-    max-height: 200px; /* Ajustado para caber melhor */
+    max-height: 300px;
     overflow-y: auto;
 }
 
 .painel-visual {
-    margin: 20px auto;
     width: 300px;
     height: 300px;
-    position: relative; /* Já estava, mas é crucial */
-    display: flex; /* Para centralizar o conteúdo */
+    position: relative;
+    display: flex; 
     justify-content: center;
     align-items: center;
+    border-radius: 50%; /* Para dar um formato de planeta */
+    overflow: hidden; /* Garante que a imagem não saia do círculo */
+    box-shadow: 0 0 20px rgba(0, 153, 255, 0.5);
 }
 
-.stats-overlay {
+.painel-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.painel-visual .overlay-stat {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-    background: rgba(11, 12, 42, 0.7);
-    border-radius: 8px;
-    padding: 10px;
-    text-align: center;
+    bottom: 10px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+
+#conquistas-container-game {
+    background: var(--cor-fundo-card);
+    border-radius: 12px;
+    padding: 15px;
+    margin: 20px auto;
+    width: clamp(280px, 90vw, 400px);
+    box-shadow: 0 0 12px rgba(100, 100, 255, 0.2);
     backdrop-filter: blur(4px);
-    border: 1px solid var(--cor-detalhe);
-    z-index: 101; /* Garante que fique acima do painel-status se houver sobreposição */
+    text-align: left;
+}
+
+#conquistas-lista-game {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
 }
 
 .painel-status:hover {
@@ -597,32 +625,31 @@ input[type="range"] {
     transform: translateY(0);
 }
 
-.hidden {
+#conquistas-container, #conquistas-container-game {
+    background: var(--cor-fundo-card);
+    border-radius: 12px;
+    padding: 15px;
+    margin: 20px auto;
+    width: clamp(280px, 90vw, 350px);
+    box-shadow: 0 0 12px rgba(100, 100, 255, 0.2);
+    backdrop-filter: blur(4px);
+    text-align: left;
+    max-height: 400px;
+    overflow-y: auto;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease, max-height 0.5s ease, padding 0.5s ease, margin 0.5s ease;
+}
+
+#conquistas-container.hidden, #conquistas-container-game.hidden {
     opacity: 0;
     transform: translateY(20px);
     pointer-events: none;
-}
-
-/* Estilos para notificação de conquista */
-.notification {
-    position: fixed;
-    top: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(45deg, #ffcc00, #ffd700);
-    color: #000;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-weight: bold;
-    font-size: 1.2em;
-    box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
-    z-index: 2000;
-    animation: notification-pop 0.5s ease-out;
-}
-
-@keyframes notification-pop {
-    0% { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-    100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+    max-height: 0;
+    padding: 0 15px;
+    margin: 0 auto;
+    border: none;
+    box-shadow: none;
 }
 
 @media (max-width: 500px) {
@@ -657,7 +684,6 @@ input[type="range"] {
     }
     body::before, body::after { animation-duration: 200s; opacity: 0.4; }
     .estrela-cadente { animation-duration: 8s; }
-    /* Para mobile, stack os elementos */
     .game-main {
         flex-direction: column;
     }
@@ -670,8 +696,6 @@ input[type="range"] {
         margin-bottom: 10px;
     }
     .painel-status {
-        bottom: 10px;
-        right: 10px;
         width: 90vw;
         max-width: 300px;
     }
@@ -688,7 +712,7 @@ input[type="range"] {
     border-color: var(--cor-erro);
     background: rgba(255, 99, 71, 0.3);
     cursor: pointer;
-    position: relative; /* Adicionado para ::after */
+    position: relative;
 }
 
 .btn-upgrade.insuficiente::after {
@@ -706,7 +730,6 @@ input[type="range"] {
     box-shadow: 0 0 10px var(--cor-erro), 0 0 20px rgba(255, 99, 71, 0.5);
 }
 
-/* Estilos para o container de som */
 #controle-som-container {
     max-height: 0;
     overflow: hidden;
@@ -727,12 +750,13 @@ input[type="range"] {
     box-shadow: 0 0 15px #00ffcc;
 }
 
-/* Novo: Wrapper para alinhar painel-visual e painel-status */
 .game-main {
     display: flex;
+    flex-direction: column; /* Altera para coluna para empilhar os painéis */
     justify-content: center;
     align-items: center;
     gap: 20px;
     flex-wrap: wrap;
 }
+
 
