@@ -638,10 +638,18 @@ input[type="range"] {
     overflow: hidden;
 }
 
-/* Container específico para conquistas no jogo */
+/* Estilos existentes... */
+
 #conquistas-container-game {
-    position: relative;
-    margin-top: 30px;
+    background: var(--cor-fundo-card);
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 10px;
+    box-shadow: 0 0 8px rgba(158, 207, 255, 0.3);
+    text-align: left;
+}
+
+/* Estilos existentes... */
 }
 
 #conquistas-container-game h2 {
@@ -992,4 +1000,5 @@ input[type="range"] {
 }
 
 /* Resto do CSS permanece igual... */
+
 
