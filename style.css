@@ -499,14 +499,19 @@ input[type="range"] {
 
 .upgrade-card.erro {
     border-color: var(--cor-erro);
-    animation: glow-error 0.5s forwards;
-    box-shadow: 0 0 15px var(--cor-erro);
+    background: rgba(255, 99, 71, 0.1);
+    animation: shake-error 0.5s ease-in-out, glow-error 2s ease-in-out;
+}
+
+@keyframes shake-error {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
 @keyframes glow-error {
-    0% { box-shadow: 0 0 12px rgba(255, 99, 71, 0.2); }
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 99, 71, 0.3); }
     50% { box-shadow: 0 0 20px rgba(255, 99, 71, 0.6); }
-    100% { box-shadow: 0 0 12px rgba(255, 99, 71, 0.2); }
 }
 
 #universo-img {
@@ -618,11 +623,11 @@ input[type="range"] {
     box-shadow: 0 0 12px rgba(100, 100, 255, 0.2);
     backdrop-filter: blur(4px);
     text-align: left;
-    max-height: 400px;
+    max-height: 500px;
     overflow-y: auto;
     opacity: 1;
     transform: translateY(0);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #conquistas-container.hidden, 
@@ -638,23 +643,6 @@ input[type="range"] {
     overflow: hidden;
 }
 
-/* Estilos existentes... */
-
-#conquistas-container-game {
-    background: var(--cor-fundo-card);
-    border-radius: 12px;
-    padding: 15px;
-    margin-top: 10px;
-    box-shadow: 0 0 8px rgba(158, 207, 255, 0.3);
-    text-align: left;
-}
-
-/* Estilos existentes... */
-}
-
-/* Estilos existentes... */
-}
-
 #conquistas-container-game h2 {
     text-align: center;
     color: var(--cor-titulo);
@@ -666,50 +654,105 @@ input[type="range"] {
 /* Estilo para lista de conquistas */
 #conquistas-lista,
 #conquistas-lista-game {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
 }
 
 /* Cards de conquista individuais */
 .conquista-card {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--cor-detalhe);
-    border-radius: 8px;
-    padding: 12px;
+    border-radius: 12px;
+    padding: 15px;
     transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.conquista-card:not(.comprado) {
+    opacity: 0.7;
+    filter: grayscale(0.3);
 }
 
 .conquista-card.comprado {
-    border-color: var(--cor-sucesso);
-    background: rgba(76, 175, 80, 0.1);
-    animation: glow-success 2s ease-in-out;
+    border-color: #FFD700;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+    animation: conquista-gold-glow 3s ease-in-out infinite;
+}
+
+.conquista-card.comprado::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+    transform: rotate(45deg);
+    animation: shine 3s ease-in-out infinite;
+}
+
+@keyframes conquista-gold-glow {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.4),
+                   0 0 30px rgba(255, 215, 0, 0.2);
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.6),
+                   0 0 50px rgba(255, 215, 0, 0.3),
+                   0 0 70px rgba(255, 215, 0, 0.1);
+    }
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
 }
 
 .conquista-card h3 {
     color: var(--cor-titulo);
-    margin: 0 0 5px 0;
-    font-size: 1em;
+    margin: 0 0 8px 0;
+    font-size: 1.1em;
+}
+
+.conquista-card.comprado h3 {
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 .conquista-card p {
-    margin: 2px 0;
+    margin: 5px 0;
     font-size: 0.9em;
+    line-height: 1.4;
 }
 
 .conquista-card .status {
-    font-weight: bold;
-    margin-top: 5px;
+    margin-top: 8px;
     font-size: 0.85em;
+    font-weight: bold;
 }
 
 .conquista-card.comprado .status {
-    color: var(--cor-sucesso);
+    color: #FFD700 !important;
+    font-weight: bold;
+    animation: pulse-gold 2s ease-in-out infinite;
 }
 
 .conquista-card:not(.comprado) .status {
     color: var(--cor-erro);
     opacity: 0.7;
+}
+
+@keyframes pulse-gold {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
 }
 
 /* Notificação de conquista */
@@ -742,11 +785,14 @@ input[type="range"] {
     border: none;
     margin: 10px auto;
     display: block;
+    font-weight: bold;
+    transition: all 0.3s ease;
 }
 
 .btn-toggle-conquistas:hover {
     background: linear-gradient(45deg, #FFA500, #FF8C00);
-    box-shadow: 0 0 15px #FFD700;
+    box-shadow: 0 0 20px #FFD700;
+    transform: translateY(-2px);
 }
 
 #controle-som-container {
@@ -836,11 +882,6 @@ input[type="range"] {
     .game-main {
         flex-direction: column;
     }
-    .stats-overlay {
-        position: static;
-        background: var(--cor-fundo-card);
-        margin-top: 10px;
-    }
     #tituloContainer {
         margin-bottom: 10px;
     }
@@ -862,146 +903,3 @@ input[type="range"] {
     .upgrade-card { width: 45%; display: inline-block; margin: 1%; }
     .painel-navegacao-rapida { width: 60%; }
 }
-/* === ANIMAÇÕES DE CONQUISTAS DOURADAS === */
-.conquista-card.comprado {
-    border-color: #FFD700;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-    position: relative;
-    overflow: hidden;
-    animation: conquista-gold-glow 3s ease-in-out infinite;
-}
-
-.conquista-card.comprado::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
-    transform: rotate(45deg);
-    animation: shine 3s ease-in-out infinite;
-}
-
-@keyframes conquista-gold-glow {
-    0%, 100% { 
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.4),
-                   0 0 30px rgba(255, 215, 0, 0.2);
-    }
-    50% { 
-        box-shadow: 0 0 30px rgba(255, 215, 0, 0.6),
-                   0 0 50px rgba(255, 215, 0, 0.3),
-                   0 0 70px rgba(255, 215, 0, 0.1);
-    }
-}
-
-@keyframes shine {
-    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-    50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-}
-
-.conquista-card.comprado h3 {
-    color: #FFD700;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-
-.conquista-card.comprado .status {
-    color: #FFD700 !important;
-    font-weight: bold;
-    animation: pulse-gold 2s ease-in-out infinite;
-}
-
-@keyframes pulse-gold {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(1.05); }
-}
-
-/* === ANIMAÇÃO DE ERRO MELHORADA === */
-.upgrade-card.erro {
-    border-color: var(--cor-erro);
-    background: rgba(255, 99, 71, 0.1);
-    animation: shake-error 0.5s ease-in-out, glow-error 2s ease-in-out;
-}
-
-@keyframes shake-error {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
-
-@keyframes glow-error {
-    0%, 100% { box-shadow: 0 0 10px rgba(255, 99, 71, 0.3); }
-    50% { box-shadow: 0 0 20px rgba(255, 99, 71, 0.6); }
-}
-
-/* === MELHORIAS NO LAYOUT DAS CONQUISTAS === */
-#conquistas-container, 
-#conquistas-container-game {
-    max-height: 500px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-#conquistas-lista,
-#conquistas-lista-game {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 10px;
-}
-
-.conquista-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--cor-detalhe);
-    border-radius: 12px;
-    padding: 15px;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-}
-
-.conquista-card:not(.comprado) {
-    opacity: 0.7;
-    filter: grayscale(0.3);
-}
-
-.conquista-card h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.1em;
-    color: var(--cor-titulo);
-}
-
-.conquista-card p {
-    margin: 5px 0;
-    font-size: 0.9em;
-    line-height: 1.4;
-}
-
-.conquista-card .status {
-    margin-top: 8px;
-    font-size: 0.85em;
-    font-weight: bold;
-}
-
-/* === BOTÃO DE CONQUISTAS NO JOGO === */
-.btn-toggle-conquistas {
-    background: linear-gradient(45deg, #FFD700, #FFA500);
-    color: #000;
-    border: none;
-    margin: 10px auto;
-    display: block;
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-
-.btn-toggle-conquistas:hover {
-    background: linear-gradient(45deg, #FFA500, #FF8C00);
-    box-shadow: 0 0 20px #FFD700;
-    transform: translateY(-2px);
-}
-
-/* Resto do CSS permanece igual... */
-
-
