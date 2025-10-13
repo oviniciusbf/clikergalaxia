@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -46,18 +47,17 @@
                 <div class="stats-overlay">
                     <p class="overlay-stat era-atual">Era Atual: <span id="era-atual">Planeta Básico</span></p>
                 </div>
+                <!-- Painel de status reposicionado para canto inferior direito, com cliques adicionado -->
+                <div class="painel-status">
+                    <p>Energia Cósmica: ⚡ <span id="dinheiro">0</span></p>
+                    <p>Cliques Totais: <span id="move-counter-status">0</span></p>
+                    <p>Tempo de Jogo: <span id="timer">00:00</span></p>
+                    <p class="progresso-titulo">Progresso para a Próxima Era:</p>
+                    <progress id="barraExpansao" value="0" max="100"></progress>
+                    <p id="progresso-texto">0/500 cliques</p>
+                    <div id="mensagem"></div>
+                </div>
             </div>
-        </div>
-
-        <!-- Painel de status reposicionado para canto inferior direito, com cliques adicionado -->
-        <div class="painel-status">
-            <p>Energia Cósmica: ⚡ <span id="dinheiro">0</span></p>
-            <p>Cliques Totais: <span id="move-counter-status">0</span></p>
-            <p>Tempo de Jogo: <span id="timer">00:00</span></p>
-            <p class="progresso-titulo">Progresso para a Próxima Era:</p>
-            <progress id="barraExpansao" value="0" max="100"></progress>
-            <p id="progresso-texto">0/500 cliques</p>
-            <div id="mensagem"></div>
         </div>
 
         <div class="painel-navegacao-rapida">
