@@ -2,86 +2,102 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galáxia Clicker</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="telaInicio">
-        <h1>🌌 Bem-vindo ao Galáxia Clicker</h1>
-        <p>Comece sua jornada expandindo sua civilização através da galáxia!</p>
-        <label for="nomeEmpresa">Nome da sua civilização galáctica:</label>
-        <input type="text" id="nomeEmpresa" placeholder="Digite aqui...">
-        <button id="iniciar-jogo-btn" class="btn btn-acao">Explorar o Universo</button>
-
-        <!-- Menu de Conquistas na tela inicial -->
-        <button id="btnToggleConquistas" class="btn">Ver Conquistas</button>
-        <div id="conquistas-container" class="hidden"></div>
-    </div>
-
-    <div id="jogo" class="hidden">
-        <div class="painel-salvar">
-            <button id="btnSalvar" class="btn">Salvar Jogo</button>
-            <button id="btnReiniciar" class="btn btn-reiniciar">Reiniciar Jogo</button>
-            <button id="btnToggleControleSom" class="btn btn-toggle-som">🔊 Controle de Som</button>
-            <div id="controle-som-container" class="controle-som hidden">
-                <button id="btnToggleSomGeral" class="btn btn-toggle-som">Som Ativado</button>
-                <button id="btnToggleSomFundo" class="btn btn-toggle-som">Som de Fundo Ativado</button>
-                <label for="volumeMaster">Volume Geral: <span id="volumeValor">50%</span></label>
-                <input type="range" id="volumeMaster" min="0" max="100" value="50">
-                <p id="ultimaMensagemErro">Nenhum erro recente.</p>
-            </div>
-            <button id="btnToggleConquistasGame" class="btn btn-toggle-conquistas">Ver Conquistas</button>
-            <div id="conquistas-container-game" class="hidden">
-                <h2>Conquistas</h2>
-                <div id="conquistas-lista-game"></div>
-            </div>
-            <div id="mensagem-salvar" class="hidden">Jogo Salvo!</div>
-        </div>
-
-        <!-- Título simplificado sem renda -->
+    <header>
         <div id="tituloContainer">
             <h1 id="tituloEmpresa">🚀 Galáxia Clicker - Era Planeta Básico</h1>
         </div>
+    </header>
 
-        <div class="game-main">
-            <!-- Painel de status agora acima do painel visual -->
-            <div class="painel-status">
-                <p>Energia Cósmica: ⚡ <span id="dinheiro">0</span></p>
-                <p>Cliques Totais: <span id="move-counter-status">0</span></p>
-                <p>Tempo de Jogo: <span id="timer">00:00</span></p>
-                <p class="progresso-titulo">Progresso para a Próxima Era:</p>
-                <progress id="barraExpansao" value="0" max="100"></progress>
-                <p id="progresso-texto">0/500 cliques</p>
-                <div id="mensagem"></div>
+    <main>
+        <section id="telaInicio">
+            <h1>🌌 Bem-vindo ao Galáxia Clicker</h1>
+            <p>Comece sua jornada expandindo sua civilização através da galáxia!</p>
+            <label for="nomeEmpresa">Nome da sua civilização galáctica:</label>
+            <input type="text" id="nomeEmpresa" placeholder="Digite aqui...">
+            <button id="btnIniciarJogo" class="btn btn-acao">Explorar o Universo</button>
+
+            <!-- Menu de Conquistas na tela inicial -->
+            <button id="btnConquistasInicial" class="btn">Ver Conquistas</button>
+            <div id="conquistas-container" class="modal hidden" role="dialog" aria-labelledby="conquistas-title-initial">
+                <h2 id="conquistas-title-initial">Conquistas</h2>
+                <div id="conquistas-lista"></div>
+                <button class="btn-fechar-modal">Fechar</button>
             </div>
-            <div class="painel-visual">
-                <img id="universo-img" src="imagens/planeta.png" alt="Universo em Expansão">
-                <p class="overlay-stat era-atual">Era Atual: <span id="era-atual">Planeta Básico</span></p>
+        </section>
+
+        <section id="jogo" class="hidden">
+            <aside class="painel-controles">
+                <button id="btnSalvar" class="btn">Salvar Jogo</button>
+                <button id="btnReiniciar" class="btn btn-reiniciar">Reiniciar Jogo</button>
+                <button id="btnPausar" class="btn">Pausar Jogo</button>
+                <button id="btnToggleControleSom" class="btn btn-toggle-som">🔊 Controle de Som</button>
+                <div id="controle-som-container" class="controle-som hidden">
+                    <button id="btnToggleSomGeral" class="btn btn-toggle-som" role="switch" aria-checked="true">Som Ativado</button>
+                    <button id="btnToggleSomFundo" class="btn btn-toggle-som" role="switch" aria-checked="true">Som de Fundo Ativado</button>
+                    <label for="volumeMaster" id="volume-label">Volume Geral: <span id="volumeValor">50%</span></label>
+                    <input type="range" id="volumeMaster" min="0" max="100" value="50">
+                    <p id="ultimaMensagemErro">Nenhum erro recente.</p>
+                </div>
+                <button id="btnConquistasGame" class="btn btn-toggle-conquistas">Ver Conquistas</button>
+                <div id="conquistas-container-game" class="modal hidden" role="dialog" aria-labelledby="conquistas-title-game">
+                    <h2 id="conquistas-title-game">Conquistas</h2>
+                    <div id="conquistas-lista-game"></div>
+                    <button class="btn-fechar-modal">Fechar</button>
+                </div>
+                <div id="mensagem-salvar" class="notification hidden">Jogo Salvo!</div>
+            </aside>
+
+            <div class="game-content">
+                <div class="painel-status" id="painel-status">
+                    <p>Energia Cósmica: ⚡ <span id="dinheiro">0</span></p>
+                    <p>Renda por Segundo: ⚡ <span id="renda-por-segundo">0</span>/s</p>
+                    <p>Cliques Totais: <span id="move-counter-status">0</span></p>
+                    <p>Tempo de Jogo: <span id="timer">00:00</span></p>
+                    <p class="progresso-titulo">Progresso para a Próxima Era:</p>
+                    <progress id="barraExpansao" value="0" max="100" aria-label="Progresso para a próxima era"></progress>
+                    <p id="progresso-texto">0/500 cliques</p>
+                    <div id="mensagem" class="notification"></div>
+                </div>
+
+                <div class="painel-visual" id="main-click-area">
+                    <div id="star-background"></div>
+                    <img id="universo-img" src="imagens/planeta.png" alt="Universo em Expansão">
+                    <p class="overlay-stat era-atual">Era Atual: <span id="era-atual">Planeta Básico</span></p>
+                </div>
             </div>
-        </div>
 
-        <div class="painel-navegacao-rapida">
-            <button id="btnIrParaUpgrades" class="btn btn-navegacao">⬇️ Upgrades/Expansões</button>
-            <button id="btnIrParaStatus" class="btn btn-navegacao hidden">⬆️ Status/Planeta</button>
-        </div>
+            <nav class="painel-navegacao-rapida">
+                <button id="btnIrParaUpgrades" class="btn btn-navegacao">⬇️ Upgrades/Expansões</button>
+                <button id="btnIrParaStatus" class="btn btn-navegacao hidden">⬆️ Status/Planeta</button>
+            </nav>
 
-        <div id="upgrades-container">
-            <div class="menu-tabs">
-                <button id="tab-btn-clique" class="tab-button">Upgrades de Clique</button>
-                <button id="tab-btn-automatica" class="tab-button">Renda Automática</button>
-                <button id="tab-btn-expansao" class="tab-button">Expansões</button>
-            </div>
+            <section id="upgrades-container">
+                <h2 id="upgrades-title">Melhorias</h2>
+                <div class="menu-tabs">
+                    <button id="btn-tab-clique" class="tab-button" role="tab" aria-selected="true">Upgrades de Clique</button>
+                    <button id="btn-tab-automatica" class="tab-button" role="tab" aria-selected="false">Renda Automática</button>
+                    <button id="btn-tab-expansao" class="tab-button" role="tab" aria-selected="false">Expansões</button>
+                </div>
 
-            <div id="clique-tab" class="tab-content"></div>
-            <div id="automatica-tab" class="tab-content hidden"></div>
-            <div id="expansao-tab" class="tab-content hidden"></div>
-        </div>
+                <div id="clique-tab" class="tab-content" role="tabpanel"></div>
+                <div id="automatica-tab" class="tab-content hidden" role="tabpanel"></div>
+                <div id="expansao-tab" class="tab-content hidden" role="tabpanel"></div>
+            </section>
 
-        <!-- Notificação de conquista adicionada -->
-        <div id="achievement-notification" class="notification hidden">🏆 Conquista Desbloqueada!</div>
-    </div>
+            <!-- Notificação de conquista -->
+            <div id="achievement-notification" class="notification hidden" aria-live="polite">🏆 Conquista Desbloqueada!</div>
+        </section>
+    </main>
 
-    <script src="script.js"></script>
+    <script src="logger.js" defer></script>
+    <script src="audio.js" defer></script>
+    <script src="achievements.js" defer></script>
+    <script src="script.js" defer></script>
 </body>
 </html>
