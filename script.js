@@ -259,22 +259,37 @@ const Game = {
 
     // --- Sistema de Conquistas CORRIGIDO ---
     verificarConquistas() {
+        let novasConquistas = [];
+        
         this.data.CONQUISTAS.forEach(c => {
             if (!this.state.conquistasDesbloqueadas.includes(c.id) && c.condicao()) {
                 this.state.conquistasDesbloqueadas.push(c.id);
-                this.mostrarNotificacaoConquista(c.nome);
-                this.exibirMensagem(`🏆 Nova Conquista: ${c.nome}!`, '#ffcc00');
+                novasConquistas.push(c.nome);
                 this.tocarSom(this.data.SONS.conquista);
-                this.renderizarConquistas();
             }
         });
+
+        if (novasConquistas.length > 0) {
+            novasConquistas.forEach((nome, index) => {
+                setTimeout(() => {
+                    this.mostrarNotificacaoConquista(nome);
+                    this.exibirMensagem(`🏆 Conquista Desbloqueada: ${nome}!`, '#FFD700');
+                }, index * 1500);
+            });
+            this.renderizarConquistas();
+        }
     },
 
     mostrarNotificacaoConquista(nome) {
         const notificacao = this.elements.achievementNotification;
         if (notificacao) {
-            notificacao.textContent = `🏆 Conquista Desbloqueada: ${nome}!`;
+            notificacao.innerHTML = `🏆 ${nome}`;
             notificacao.classList.remove('hidden');
+            
+            // Adiciona animação de brilho dourado
+            notificacao.style.background = 'linear-gradient(45deg, #FFD700, #FFA500)';
+            notificacao.style.boxShadow = '0 0 30px rgba(255, 215, 0, 0.8)';
+            
             setTimeout(() => {
                 notificacao.classList.add('hidden');
             }, 3000);
@@ -283,63 +298,57 @@ const Game = {
 
     renderizarConquistas() {
         // Renderiza conquistas na tela inicial
-        const containerInicio = this.elements.conquistasContainer;
+        this.renderizarConquistasContainer(this.elements.conquistasContainer, 'conquistas-lista');
         // Renderiza conquistas no jogo
-        const containerGame = this.elements.conquistasContainerGame;
+        this.renderizarConquistasContainer(this.elements.conquistasContainerGame, 'conquistas-lista-game');
+    },
+
+    renderizarConquistasContainer(container, listaId) {
+        if (!container) return;
         
-        [containerInicio, containerGame].forEach(container => {
-            if (!container) return;
-            
-            // Limpa o container
-            const lista = container.querySelector('#conquistas-lista, #conquistas-lista-game');
-            if (lista) {
-                lista.innerHTML = '';
-                
-                this.data.CONQUISTAS.forEach(c => {
-                    const isDesbloqueada = this.state.conquistasDesbloqueadas.includes(c.id);
-                    const card = document.createElement('div');
-                    card.className = `conquista-card ${isDesbloqueada ? 'comprado' : ''}`;
-                    card.innerHTML = `
-                        <h3>${c.nome}</h3>
-                        <p>${c.descricao}</p>
-                        <p class="status">${isDesbloqueada ? '🏆 Desbloqueada!' : '🔒 Bloqueada'}</p>
-                    `;
-                    lista.appendChild(card);
-                });
-            }
+        let lista = container.querySelector(`#${listaId}`);
+        if (!lista) {
+            lista = document.createElement('div');
+            lista.id = listaId;
+            lista.className = 'conquistas-lista';
+            container.appendChild(lista);
+        }
+        
+        lista.innerHTML = '';
+        
+        this.data.CONQUISTAS.forEach(c => {
+            const isDesbloqueada = this.state.conquistasDesbloqueadas.includes(c.id);
+            const card = document.createElement('div');
+            card.className = `conquista-card ${isDesbloqueada ? 'comprado' : ''}`;
+            card.innerHTML = `
+                <h3>${c.nome}</h3>
+                <p>${c.descricao}</p>
+                <p class="status">${isDesbloqueada ? '🏆 DESBLOQUEADA!' : '🔒 BLOQUEADA'}</p>
+            `;
+            lista.appendChild(card);
         });
     },
 
-    toggleConquistas() {
-        // Toggle para conquistas na tela inicial
-        const containerInicio = this.elements.conquistasContainer;
-        const btnInicio = this.elements.btnToggleConquistas;
+    toggleConquistas(container, botao) {
+        if (!container || !botao) return;
         
-        // Toggle para conquistas no jogo
-        const containerGame = this.elements.conquistasContainerGame;
-        const btnGame = this.elements.btnToggleConquistasGame;
-
-        // Toggle container de início
-        if (containerInicio && btnInicio) {
-            if (containerInicio.classList.contains('hidden')) {
-                containerInicio.classList.remove('hidden');
-                btnInicio.textContent = 'Esconder Conquistas';
-            } else {
-                containerInicio.classList.add('hidden');
-                btnInicio.textContent = 'Ver Conquistas';
-            }
+        if (container.classList.contains('hidden')) {
+            container.classList.remove('hidden');
+            botao.textContent = 'Esconder Conquistas';
+            // Força re-renderização para garantir que estejam atualizadas
+            this.renderizarConquistas();
+        } else {
+            container.classList.add('hidden');
+            botao.textContent = 'Ver Conquistas';
         }
+    },
 
-        // Toggle container do jogo
-        if (containerGame && btnGame) {
-            if (containerGame.classList.contains('hidden')) {
-                containerGame.classList.remove('hidden');
-                btnGame.textContent = 'Esconder Conquistas';
-            } else {
-                containerGame.classList.add('hidden');
-                btnGame.textContent = 'Ver Conquistas';
-            }
-        }
+    toggleConquistasInicio() {
+        this.toggleConquistas(this.elements.conquistasContainer, this.elements.btnToggleConquistas);
+    },
+
+    toggleConquistasGame() {
+        this.toggleConquistas(this.elements.conquistasContainerGame, this.elements.btnToggleConquistasGame);
     },
 
     // --- Loop Principal ---
@@ -348,7 +357,7 @@ const Game = {
             this.coletarRendaAutomatica();
             this.aumentarTempo();
             this.atualizarExibicao();
-            this.verificarConquistas(); // Agora funciona corretamente
+            this.verificarConquistas();
             this.settings.ultimoUpdate = timestamp;
         }
         requestAnimationFrame(this.updateLoop.bind(this));
@@ -452,22 +461,48 @@ const Game = {
 
     comprarUpgrade(upgradeId) {
         const upgrade = this.data.UPGRADES_CONFIG.find(u => u.id === upgradeId);
-        if (!upgrade || this.state.energia < upgrade.custo) {
+        if (!upgrade) return;
+
+        const currentUpgradeState = this.state.upgradesComprados[upgrade.id] || { comprados: 0, custo: upgrade.baseCusto };
+        const custoAtual = currentUpgradeState.custo;
+
+        if (this.state.energia < custoAtual) {
+            // ANIMAÇÃO E SOM DE ERRO CORRIGIDOS
             this.tocarSom(this.data.SONS.erro);
             this.exibirMensagem('Energia insuficiente!', '#ff6347', true);
+            
+            const card = document.getElementById(`card-${upgrade.id}`);
+            if (card) {
+                card.classList.add('erro');
+                setTimeout(() => card.classList.remove('erro'), 1000);
+            }
+            
+            const button = document.getElementById(`btn-${upgrade.id}`);
+            if (button) {
+                button.classList.add('insuficiente');
+                setTimeout(() => {
+                    if (this.state.energia < custoAtual) {
+                        button.classList.add('insuficiente');
+                    }
+                }, 1000);
+            }
             return;
         }
 
-        this.state.energia -= upgrade.custo;
+        // COMPRA BEM-SUCEDIDA
+        this.state.energia -= custoAtual;
+        
         if (!this.state.upgradesComprados[upgrade.id]) {
             this.state.upgradesComprados[upgrade.id] = { comprados: 0, custo: upgrade.baseCusto };
         }
         this.state.upgradesComprados[upgrade.id].comprados++;
         
         this.aplicarEfeito(upgrade.efeito);
+        
         if (upgrade.multiplicavel) {
-            upgrade.custo = Math.floor(upgrade.baseCusto * Math.pow(1.15, this.state.upgradesComprados[upgrade.id].comprados));
-            this.state.upgradesComprados[upgrade.id].custo = upgrade.custo;
+            const novoCusto = Math.floor(upgrade.baseCusto * Math.pow(1.15, this.state.upgradesComprados[upgrade.id].comprados));
+            upgrade.custo = novoCusto;
+            this.state.upgradesComprados[upgrade.id].custo = novoCusto;
         }
 
         this.atualizarExibicao();
@@ -478,6 +513,7 @@ const Game = {
             card.classList.add('feedback-compra');
             setTimeout(() => card.classList.remove('feedback-compra'), 1000);
         }
+        
         this.exibirTextoFlutuante('Upgrade Comprado!', { clientX: window.innerWidth/2, clientY: window.innerHeight/2 });
     },
 
@@ -850,13 +886,28 @@ const Game = {
             btnToggleControleSom: document.getElementById('btnToggleControleSom'),
             controleSomContainer: document.getElementById('controle-som-container'),
             btnToggleConquistas: document.getElementById('btnToggleConquistas'),
-            btnToggleConquistasGame: document.getElementById('btnToggleConquistasGame'),
             conquistasContainer: document.getElementById('conquistas-container'),
             conquistasContainerGame: document.getElementById('conquistas-container-game'),
             achievementNotification: document.getElementById('achievement-notification'),
             painelStatus: document.querySelector('.painel-status'),
             upgradesContainer: document.getElementById('upgrades-container')
         };
+
+        // CORREÇÃO: Cria botão de conquistas no jogo se não existir
+        if (!document.getElementById('btnToggleConquistasGame')) {
+            const btnConquistasGame = document.createElement('button');
+            btnConquistasGame.id = 'btnToggleConquistasGame';
+            btnConquistasGame.className = 'btn btn-toggle-conquistas';
+            btnConquistasGame.textContent = 'Ver Conquistas';
+            
+            const conquistasContainerGame = this.elements.conquistasContainerGame;
+            if (conquistasContainerGame && conquistasContainerGame.parentNode) {
+                conquistasContainerGame.parentNode.insertBefore(btnConquistasGame, conquistasContainerGame);
+                this.elements.btnToggleConquistasGame = btnConquistasGame;
+            }
+        } else {
+            this.elements.btnToggleConquistasGame = document.getElementById('btnToggleConquistasGame');
+        }
 
         // Verifica URL params para modo de teste
         const urlParams = new URLSearchParams(window.location.search);
@@ -873,26 +924,12 @@ const Game = {
         if (this.elements.btnIrParaStatus) this.elements.btnIrParaStatus.addEventListener('click', this.rolarParaStatus.bind(this));
         window.addEventListener('scroll', this.gerenciarBotoesDeRolagem.bind(this));
         
-        // CORREÇÃO: Adiciona botão de conquistas no jogo
-        if (!document.getElementById('btnToggleConquistasGame')) {
-            const btnConquistasGame = document.createElement('button');
-            btnConquistasGame.id = 'btnToggleConquistasGame';
-            btnConquistasGame.className = 'btn btn-toggle-conquistas';
-            btnConquistasGame.textContent = 'Ver Conquistas';
-            
-            const conquistasContainerGame = this.elements.conquistasContainerGame;
-            if (conquistasContainerGame && conquistasContainerGame.parentNode) {
-                conquistasContainerGame.parentNode.insertBefore(btnConquistasGame, conquistasContainerGame);
-                this.elements.btnToggleConquistasGame = btnConquistasGame;
-            }
-        }
-
         // Event listeners para conquistas - CORRIGIDO
         if (this.elements.btnToggleConquistas) {
-            this.elements.btnToggleConquistas.addEventListener('click', this.toggleConquistas.bind(this));
+            this.elements.btnToggleConquistas.addEventListener('click', this.toggleConquistasInicio.bind(this));
         }
         if (this.elements.btnToggleConquistasGame) {
-            this.elements.btnToggleConquistasGame.addEventListener('click', this.toggleConquistas.bind(this));
+            this.elements.btnToggleConquistasGame.addEventListener('click', this.toggleConquistasGame.bind(this));
         }
         
         if (this.elements.telaJogo) {
