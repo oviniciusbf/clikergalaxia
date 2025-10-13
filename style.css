@@ -851,3 +851,145 @@ input[type="range"] {
     .upgrade-card { width: 45%; display: inline-block; margin: 1%; }
     .painel-navegacao-rapida { width: 60%; }
 }
+/* === ANIMAÇÕES DE CONQUISTAS DOURADAS === */
+.conquista-card.comprado {
+    border-color: #FFD700;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+    animation: conquista-gold-glow 3s ease-in-out infinite;
+}
+
+.conquista-card.comprado::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+    transform: rotate(45deg);
+    animation: shine 3s ease-in-out infinite;
+}
+
+@keyframes conquista-gold-glow {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.4),
+                   0 0 30px rgba(255, 215, 0, 0.2);
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.6),
+                   0 0 50px rgba(255, 215, 0, 0.3),
+                   0 0 70px rgba(255, 215, 0, 0.1);
+    }
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.conquista-card.comprado h3 {
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.conquista-card.comprado .status {
+    color: #FFD700 !important;
+    font-weight: bold;
+    animation: pulse-gold 2s ease-in-out infinite;
+}
+
+@keyframes pulse-gold {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* === ANIMAÇÃO DE ERRO MELHORADA === */
+.upgrade-card.erro {
+    border-color: var(--cor-erro);
+    background: rgba(255, 99, 71, 0.1);
+    animation: shake-error 0.5s ease-in-out, glow-error 2s ease-in-out;
+}
+
+@keyframes shake-error {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes glow-error {
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 99, 71, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(255, 99, 71, 0.6); }
+}
+
+/* === MELHORIAS NO LAYOUT DAS CONQUISTAS === */
+#conquistas-container, 
+#conquistas-container-game {
+    max-height: 500px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#conquistas-lista,
+#conquistas-lista-game {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.conquista-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--cor-detalhe);
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.conquista-card:not(.comprado) {
+    opacity: 0.7;
+    filter: grayscale(0.3);
+}
+
+.conquista-card h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1em;
+    color: var(--cor-titulo);
+}
+
+.conquista-card p {
+    margin: 5px 0;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.conquista-card .status {
+    margin-top: 8px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+/* === BOTÃO DE CONQUISTAS NO JOGO === */
+.btn-toggle-conquistas {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #000;
+    border: none;
+    margin: 10px auto;
+    display: block;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-toggle-conquistas:hover {
+    background: linear-gradient(45deg, #FFA500, #FF8C00);
+    box-shadow: 0 0 20px #FFD700;
+    transform: translateY(-2px);
+}
+
+/* Resto do CSS permanece igual... */
+
