@@ -183,15 +183,15 @@ h2 {
 }
 
 .painel-visual {
+    position: relative;
     width: 300px;
     height: 300px;
-    position: relative;
-    display: flex; 
+    display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(0, 153, 255, 0.5);
+    overflow: visible;
+    box-shadow: 0 0 40px rgba(0, 153, 255, 0.5);
 }
 
 .painel-visual img {
@@ -521,9 +521,10 @@ input[type="range"] {
     border-radius: 50%;
     border: 2px solid var(--cor-detalhe);
     box-shadow: 0 0 20px var(--cor-botoes-gradiente-1);
-    animation: galaxy-glow 4s ease-in-out infinite alternate;
-    transition: box-shadow 0.1s ease, transform 0.1s ease, opacity 1s ease-in-out;
-    opacity: 1;
+    animation: 
+        galaxy-glow 4s ease-in-out infinite alternate,
+        rotacao-suave 120s linear infinite;
+    transition: all 0.3s ease;
     cursor: pointer;
 }
 
@@ -542,6 +543,12 @@ input[type="range"] {
     0% { box-shadow: 0 0 15px var(--cor-botoes-gradiente-1), 0 0 5px var(--cor-detalhe); }
     50% { box-shadow: 0 0 30px var(--cor-progresso), 0 0 15px var(--cor-detalhe); }
     100% { box-shadow: 0 0 15px var(--cor-botoes-gradiente-1), 0 0 5px var(--cor-detalhe); }
+}
+
+@keyframes rotacao-suave {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.02); }
+    100% { transform: rotate(360deg) scale(1); }
 }
 
 #universo-img.clique-impacto {
@@ -845,6 +852,331 @@ input[type="range"] {
     opacity: 1;
     transform: translateY(-2px);
     box-shadow: 0 0 10px var(--cor-erro), 0 0 20px rgba(255, 99, 71, 0.5);
+}
+
+/* === SISTEMA DE ANIMAÇÕES AVANÇADAS === */
+
+/* Partículas cósmicas flutuantes */
+.particula-cosmica {
+    position: fixed;
+    pointer-events: none;
+    z-index: 5;
+    border-radius: 50%;
+    animation: flutuar-cosmico 8s ease-in-out infinite;
+}
+
+.particula-cosmica.estrela {
+    background: #FFFFFF;
+    box-shadow: 0 0 6px #9ecfff, 0 0 12px #0099ff;
+}
+
+.particula-cosmica.energia {
+    background: #00ffcc;
+    box-shadow: 0 0 8px #00ffcc, 0 0 16px #00ffcc;
+}
+
+.particula-cosmica.poeira {
+    background: #6a00ff;
+    box-shadow: 0 0 4px #6a00ff;
+}
+
+@keyframes flutuar-cosmico {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg) scale(1);
+        opacity: 0.7;
+    }
+    25% { 
+        transform: translateY(-15px) rotate(90deg) scale(1.1);
+        opacity: 1;
+    }
+    50% { 
+        transform: translateY(-30px) rotate(180deg) scale(0.9);
+        opacity: 0.8;
+    }
+    75% { 
+        transform: translateY(-15px) rotate(270deg) scale(1.05);
+        opacity: 0.9;
+    }
+}
+
+/* Efeito Aurora Boreal */
+.aurora-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 30%;
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(0, 255, 204, 0.1) 20%,
+        rgba(106, 0, 255, 0.15) 40%,
+        rgba(255, 0, 128, 0.1) 60%,
+        transparent 100%
+    );
+    opacity: 0;
+    animation: aurora-movement 15s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes aurora-movement {
+    0%, 100% { 
+        opacity: 0.3;
+        transform: translateX(-10%) skewX(-5deg);
+        filter: hue-rotate(0deg);
+    }
+    25% { 
+        opacity: 0.5;
+        transform: translateX(5%) skewX(2deg);
+        filter: hue-rotate(90deg);
+    }
+    50% { 
+        opacity: 0.4;
+        transform: translateX(15%) skewX(-3deg);
+        filter: hue-rotate(180deg);
+    }
+    75% { 
+        opacity: 0.6;
+        transform: translateX(-5%) skewX(4deg);
+        filter: hue-rotate(270deg);
+    }
+}
+
+/* Efeitos de Construção */
+.efeito-construcao {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.construcao-particulas {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #FFD700;
+    border-radius: 50%;
+    animation: construcao-explosao 2s ease-out forwards;
+}
+
+@keyframes construcao-explosao {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+        box-shadow: 0 0 10px #FFD700;
+    }
+    100% {
+        transform: translate(
+            calc(var(--tx) * 100px), 
+            calc(var(--ty) * 100px)
+        ) scale(0);
+        opacity: 0;
+        box-shadow: 0 0 20px #FFA500;
+    }
+}
+
+.onda-expansao {
+    position: absolute;
+    border: 2px solid #00ffcc;
+    border-radius: 50%;
+    animation: onda-construcao 1.5s ease-out forwards;
+}
+
+@keyframes onda-construcao {
+    0% {
+        transform: scale(0.1);
+        opacity: 1;
+        width: 10px;
+        height: 10px;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+        width: 400px;
+        height: 400px;
+    }
+}
+
+/* Texturas Dinâmicas por Era */
+.era-texture {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    mix-blend-mode: overlay;
+    opacity: 0.3;
+    transition: opacity 1s ease;
+}
+
+/* Textura para cada era */
+.era-0 .era-texture { /* Planeta Básico */
+    background: radial-gradient(circle, #A6A6A6 0%, transparent 70%);
+    box-shadow: inset 0 0 50px rgba(166, 166, 166, 0.5);
+}
+
+.era-1 .era-texture { /* Colonização Inicial */
+    background: 
+        radial-gradient(circle at 30% 30%, #9400D3 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, #4B0082 0%, transparent 50%);
+    animation: pulsar-suave 4s ease-in-out infinite;
+}
+
+.era-2 .era-texture { /* Civilização Avançada */
+    background: 
+        linear-gradient(45deg, #1E90FF 0%, transparent 50%),
+        radial-gradient(circle, #00BFFF 0%, transparent 70%);
+    animation: rotacao-textura 20s linear infinite;
+}
+
+.era-3 .era-texture { /* Domínio Galáctico */
+    background: 
+        radial-gradient(circle at 20% 80%, #FFD700 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, #FF8C00 0%, transparent 40%);
+    animation: brilho-dourado 3s ease-in-out infinite;
+}
+
+.era-4 .era-texture { /* Expansão Intergaláctica */
+    background: 
+        conic-gradient(from 0deg, #00FF7F, #008080, #00FF7F);
+    animation: rotacao-rapida 10s linear infinite;
+}
+
+@keyframes pulsar-suave {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.4; }
+}
+
+@keyframes rotacao-textura {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes brilho-dourado {
+    0%, 100% { filter: brightness(1) contrast(1); }
+    50% { filter: brightness(1.3) contrast(1.2); }
+}
+
+@keyframes rotacao-rapida {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Efeitos de Clique Melhorados */
+.efeito-clique {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, #00ffcc 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: expansao-clique 0.6s ease-out forwards;
+    z-index: 20;
+}
+
+@keyframes expansao-clique {
+    0% {
+        transform: translate(-50%, -50%) scale(0.1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
+    }
+}
+
+/* Sistema de Partículas para Renda Automática */
+.particula-renda {
+    position: fixed;
+    font-size: 1em;
+    font-weight: bold;
+    color: #00ffcc;
+    text-shadow: 0 0 5px #00ffcc;
+    pointer-events: none;
+    z-index: 25;
+    animation: subir-suave 3s ease-in forwards;
+}
+
+@keyframes subir-suave {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    80% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-100px) scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* Efeitos Especiais para Upgrades */
+.upgrade-efeito {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.upgrade-brilho {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(0, 255, 204, 0.3), transparent);
+    border-radius: 12px;
+    animation: brilho-upgrade 2s ease-in-out;
+}
+
+@keyframes brilho-upgrade {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Estados de hover melhorados */
+.painel-visual:hover #universo-img {
+    animation-duration: 60s;
+    box-shadow: 0 0 50px var(--cor-progresso), 0 0 100px rgba(0, 255, 204, 0.3);
+}
+
+/* Responsividade para animações */
+@media (max-width: 768px) {
+    .aurora-effect {
+        height: 20%;
+        animation-duration: 20s;
+    }
+    
+    #universo-img {
+        animation-duration: 180s;
+    }
+    
+    .efeito-clique {
+        width: 15px;
+        height: 15px;
+    }
+}
+
+/* Modo performance para dispositivos lentos */
+@media (prefers-reduced-motion: reduce) {
+    .particula-cosmica,
+    .aurora-effect,
+    .construcao-particulas,
+    .onda-expansao,
+    .era-texture,
+    .efeito-clique,
+    .particula-renda,
+    .upgrade-brilho {
+        animation: none !important;
+    }
+    
+    #universo-img {
+        animation: galaxy-glow 4s ease-in-out infinite alternate !important;
+    }
 }
 
 @media (max-width: 500px) {
