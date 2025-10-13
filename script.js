@@ -1,11 +1,3 @@
-// Importa os módulos
-// import { Logger } from './logger.js'; // Se estiver usando módulos ES6
-// import { AudioManager } from './audio.js';
-// import { Achievements } from './achievements.js';
-
-// Para compatibilidade com script tradicional, assumimos que Logger, AudioManager e Achievements são globais
-// Certifique-se de que logger.js e audio.js e achievements.js sejam carregados ANTES deste script no HTML.
-
 const Game = {
     // 1. ESTADO CENTRALIZADO
     state: {
@@ -22,8 +14,7 @@ const Game = {
         multiplicadorRendaAtivo: 1,
         multiplicadorCliquesTotal: 1,
         multiplicadorRendaTotal: 1,
-        conquistasDesbloqueadas: [],
-        idioma: 'pt-BR' // Adicionado para i18n
+        conquistasDesbloqueadas: []
     },
 
     // 2. CONFIGURAÇÕES E VARIÁVEIS DE CONTROLE
@@ -36,15 +27,13 @@ const Game = {
         ultimaMensagemErro: "Nenhum erro recente.",
         eventoAtual: null,
         TEST_FAST_ERAS: false,
-        TEST_CLIQUES_POR_CLIQUE: 10,
-        gameLoopInterval: null, // Para o setInterval
-        lastFrameTime: 0 // Para deltaTime
+        TEST_CLIQUES_POR_CLIQUE: 10
     },
 
     // 3. ELEMENTOS DOM (serão preenchidos em init)
     elements: {},
 
-    // 4. DADOS DO JOGO (ERAS, UPGRADES, SONS, NARRATIVAS, CONQUISTAS, EVENTOS, TEXTOS i18n)
+    // 4. DADOS DO JOGO (ERAS, UPGRADES, SONS, NARRATIVAS, CONQUISTAS, EVENTOS)
     data: {
         ERAS: [
             { nome: "Planeta Básico", baseCost: 0, costMultiplier: 1.0, imagem: "imagens/planeta.png", cor: "#A6A6A6" },
@@ -61,7 +50,7 @@ const Game = {
             { id: "drones", nome: "Drones Automatizados", descricao: "Geram +1 energia/s.", custo: 100, baseCusto: 100, efeito: { rendaAutomatica: 1 }, tipo: 'automatica', multiplicavel: true },
             { id: "estacao", nome: "Estação Orbital", descricao: "Geram +10 energia/s.", custo: 800, baseCusto: 800, efeito: { rendaAutomatica: 10 }, tipo: 'automatica', multiplicavel: true },
             { id: "fabrica", nome: "Fábrica Lunar", descricao: "Geram +25 energia/s.", custo: 2000, baseCusto: 2000, efeito: { rendaAutomatica: 25 }, tipo: 'automatica', multiplicavel: true },
-            { id: "rede", nome: "Rede de Satélites", descricao: "Geram +50 energia/s.\n", custo: 5000, baseCusto: 5000, efeito: { rendaAutomatica: 50 }, tipo: 'automatica', multiplicavel: true },
+            { id: "rede", nome: "Rede de Satélites", descricao: "Geram +50 energia/s.", custo: 5000, baseCusto: 5000, efeito: { rendaAutomatica: 50 }, tipo: 'automatica', multiplicavel: true },
             { id: "marte", nome: "Colonizar Marte", descricao: "Aumenta +20 energia/s.", custo: 1000, baseCusto: 1000, efeito: { rendaAutomatica: 20 }, tipo: 'expansao', multiplicavel: false },
             { id: "jupiter", nome: "Base em Júpiter", descricao: "Aumenta +50 energia/s.", custo: 3000, baseCusto: 3000, efeito: { rendaAutomatica: 50 }, tipo: 'expansao', multiplicavel: false },
             { id: "alfa_centauri", nome: "Estrela Alfa Centauri", descricao: "Dobra (x2) renda automática.", custo: 8000, baseCusto: 8000, efeito: { multiplicadorRendaTotal: 2 }, tipo: 'expansao', multiplicavel: false },
@@ -97,85 +86,12 @@ const Game = {
             { id: '10-upgrades', nome: 'Construtor Estelar', descricao: 'Compre 10 upgrades.', condicao: () => Object.values(Game.state.upgradesComprados).reduce((sum, u) => sum + (u ? u.comprados : 0), 0) >= 10 },
             { id: 'era-3', nome: 'Conquistador Galáctico', descricao: 'Avance para a terceira era.', condicao: () => Game.state.eraIndex >= 2 },
             { id: 'milhao-energia', nome: 'Magnata Cósmico', descricao: 'Alcance 1M de energia.', condicao: () => Game.state.energia >= 1000000 }
-        ],
-        // Textos para internacionalização (exemplo simples)
-        i18n: {
-            'pt-BR': {
-                'gameTitle': 'Galáxia Clicker',
-                'startScreenTitle': 'Bem-vindo ao Galáxia Clicker',
-                'enterName': 'Digite o nome da sua civilização:',
-                'startGame': 'Iniciar Jogo',
-                'energy': 'Energia',
-                'clicks': 'Cliques',
-                'incomePerSecond': 'Renda/s',
-                'era': 'Era',
-                'upgrades': 'Melhorias',
-                'achievements': 'Conquistas',
-                'settings': 'Configurações',
-                'clickUpgrades': 'Melhorias de Clique',
-                'autoUpgrades': 'Melhorias Automáticas',
-                'expansionUpgrades': 'Melhorias de Expansão',
-                'buy': 'Comprar',
-                'bought': 'Comprado',
-                'missing': 'Falta',
-                'permanent': 'Permanente',
-                'soundOn': 'Som: Ligado',
-                'soundOff': 'Som: Desligado',
-                'musicOn': 'Música: Ligada',
-                'musicOff': 'Música: Desligada',
-                'volume': 'Volume',
-                'resetGame': 'Reiniciar Jogo',
-                'pauseGame': 'Pausar Jogo',
-                'resumeGame': 'Retomar Jogo',
-                'gamePaused': 'Jogo pausado.',
-                'gameResumed': 'Jogo retomado!',
-                'confirmReset': 'Tem certeza que deseja reiniciar o jogo? Todo o progresso será perdido!',
-                'achievementUnlocked': '🏆 Conquista Desbloqueada: {name}!',
-                'errorSaving': 'Erro ao salvar o jogo!',
-                'errorLoading': 'Erro ao carregar o jogo!',
-                'eraMaxReached': 'Era Máxima Alcançada!',
-                'progress': 'Progresso',
-                'ofClicks': 'de cliques',
-                'achievementNotification': '🏆 {name}',
-                'cosmicInitiate': 'Iniciante Cósmico',
-                'colonizer': 'Colonizador',
-                'improver': 'Melhorador',
-                'clickMaster': 'Mestre dos Cliques',
-                'starBuilder': 'Construtor Estelar',
-                'galacticConqueror': 'Conquistador Galáctico',
-                'cosmicTycoon': 'Magnata Cósmico',
-                'reactor': 'Reator de Fusão',
-                'antimatterReactor': 'Reator de Antimatéria',
-                'quantumGloves': 'Luvas Quânticas',
-                'starCore': 'Núcleo de Estrelas',
-                'automatedDrones': 'Drones Automatizados',
-                'orbitalStation': 'Estação Orbital',
-                'lunarFactory': 'Fábrica Lunar',
-                'satelliteNetwork': 'Rede de Satélites',
-                'colonizeMars': 'Colonizar Marte',
-                'jupiterBase': 'Base em Júpiter',
-                'alphaCentauri': 'Estrela Alfa Centauri',
-                'stableBlackHole': 'Buraco Negro Estável',
-                'energyComet': 'Cometa de Energia',
-                'asteroidShower': 'Chuva de Asteróides',
-                'spaceAnomaly': 'Anomalia Espacial',
-                'eraTransition': '🎉 Parabéns! Você avançou da Era {oldEra} para a Era {newEra}!',
-                'companyTitle': '🚀 {civilizationName} - Era {eraName}'
-            }
-        }
+        ]
     },
 
     // 5. MÉTODOS DO JOGO
 
     // --- Funções de Utilidade ---
-    translate(key, replacements = {}) {
-        let text = this.data.i18n[this.state.idioma][key] || key;
-        for (const [placeholder, value] of Object.entries(replacements)) {
-            text = text.replace(`{${placeholder}}`, value);
-        }
-        return text;
-    },
-
     calcularCustoEra(eraIndex) {
         if (eraIndex >= this.data.ERAS.length) return Infinity;
         const era = this.data.ERAS[eraIndex];
@@ -197,104 +113,65 @@ const Game = {
         return `${minutosFormatados}:${segundosFormatados}`;
     },
 
-    // --- Loop Principal do Jogo com deltaTime ---
-    gameLoop(timestamp) {
-        if (!this.settings.lastFrameTime) this.settings.lastFrameTime = timestamp;
-        const deltaTime = (timestamp - this.settings.lastFrameTime) / 1000; // em segundos
-        this.settings.lastFrameTime = timestamp;
-
-        if (!this.settings.pausado) {
-            this.update(deltaTime);
+    // --- Funções de Áudio ---
+    tocarSom(som) {
+        if (this.settings.somAtivo && som) {
+            try {
+                som.currentTime = 0;
+                som.volume = this.settings.volumeMaster;
+                const playPromise = som.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.warn('Erro ao tocar som:', error.message);
+                        setTimeout(() => som.play().catch(e => console.warn('Tentativa falhou:', e.message)), 100);
+                    });
+                }
+            } catch (error) {
+                console.warn('Erro ao tentar tocar som:', error.message);
+            }
         }
-        requestAnimationFrame(this.gameLoop.bind(this));
     },
 
-    update(deltaTime) {
-        // Atualiza a renda automática baseada em deltaTime
-        const rendaPorSegundo = this.state.rendaAutomatica * this.state.multiplicadorRendaTotal * this.state.multiplicadorRendaAtivo;
-        const energiaGanho = rendaPorSegundo * deltaTime;
-        this.state.energia += energiaGanho;
-
-        // Aumenta o tempo decorrido
-        this.state.tempoDecorrido += deltaTime;
-        if (this.elements.timerSpan) this.elements.timerSpan.textContent = this.formatarTempo(Math.floor(this.state.tempoDecorrido));
-
-        // Verifica conquistas
-        Achievements.check();
-
-        // Tenta avançar de era
-        this.tentarAvancarEra();
-
-        // Atualiza a exibição da UI
-        this.atualizarExibicao();
-
-        // Gerencia botões de rolagem (se aplicável)
-        this.gerenciarBotoesDeRolagem();
+    inicializarSons() {
+        Object.values(this.data.SONS).forEach(som => {
+            som.preload = 'auto';
+            som.load();
+            som.volume = this.settings.volumeMaster;
+            som.play().then(() => {
+                som.pause();
+                som.currentTime = 0;
+            }).catch(() => {});
+        });
+        this.data.SONS.fundo.loop = true;
+        this.data.SONS.fundo.volume = this.settings.volumeMaster;
     },
 
-    // --- Funções de Jogo ---
-    clicar() {
-        if (this.settings.pausado) return;
-        const energiaGanho = this.state.energiaPorClique * this.state.multiplicadorCliquesTotal * this.state.multiplicadorCliquesAtivo;
-        this.state.energia += energiaGanho;
-        this.state.cliques++;
-        AudioManager.playSound('click');
-        this.exibirTextoFlutuante(energiaGanho, event);
-        this.atualizarExibicao();
-        Achievements.check(); // Verifica conquistas após cada clique
-    },
-
-    comprarUpgrade(upgradeId) {
-        const upgrade = this.data.UPGRADES_CONFIG.find(u => u.id === upgradeId);
-        if (!upgrade) {
-            Logger.error(`Upgrade ${upgradeId} não encontrado.`);
-            return;
+    toggleSomGeral() {
+        this.settings.somAtivo = !this.settings.somAtivo;
+        this.elements.btnToggleSomGeral.textContent = this.settings.somAtivo ? 'Som Ativado' : 'Som Desativado';
+        if (!this.settings.somAtivo) {
+            Object.values(this.data.SONS).forEach(som => som.pause());
+        } else if (this.settings.somFundoAtivo) {
+            this.data.SONS.fundo.play();
         }
+    },
 
-        const currentUpgradeState = this.state.upgradesComprados[upgrade.id] || { comprados: 0, custo: upgrade.baseCusto };
-        const custoAtual = currentUpgradeState.custo;
-
-        if (this.state.energia >= custoAtual) {
-            this.state.energia -= custoAtual;
-            AudioManager.playSound('upgrade');
-
-            // Aplica efeitos do upgrade
-            if (upgrade.efeito.energiaPorClique) {
-                this.state.energiaPorClique += upgrade.efeito.energiaPorClique;
-            }
-            if (upgrade.efeito.rendaAutomatica) {
-                this.state.rendaAutomatica += upgrade.efeito.rendaAutomatica;
-            }
-            if (upgrade.efeito.multiplicadorCliquesTotal) {
-                this.state.multiplicadorCliquesTotal *= upgrade.efeito.multiplicadorCliquesTotal;
-            }
-            if (upgrade.efeito.multiplicadorRendaTotal) {
-                this.state.multiplicadorRendaTotal *= upgrade.efeito.multiplicadorRendaTotal;
-            }
-
-            // Atualiza o estado de compras do upgrade
-            this.state.upgradesComprados[upgrade.id] = this.state.upgradesComprados[upgrade.id] || { comprados: 0, custo: upgrade.baseCusto };
-            this.state.upgradesComprados[upgrade.id].comprados++;
-
-            // Calcula novo custo se for multiplicável
-            if (upgrade.multiplicavel) {
-                const novoCusto = Math.floor(upgrade.baseCusto * Math.pow(1.15, this.state.upgradesComprados[upgrade.id].comprados));
-                this.state.upgradesComprados[upgrade.id].custo = novoCusto;
-            }
-
-            this.atualizarExibicao();
-            this.exibirNarrativa('upgrade', upgradeId);
-            Achievements.check(); // Verifica conquistas após cada compra
-
-            const card = document.getElementById(`card-${upgrade.id}`);
-            if (card) {
-                card.classList.add('feedback-compra');
-                setTimeout(() => card.classList.remove('feedback-compra'), 1000);
-            }
-            this.exibirTextoFlutuante(this.translate('upgradeBought'), { clientX: window.innerWidth/2, clientY: window.innerHeight/2 });
+    toggleSomFundo() {
+        this.settings.somFundoAtivo = !this.settings.somFundoAtivo;
+        this.elements.btnToggleSomFundo.textContent = this.settings.somFundoAtivo ? 'Som de Fundo Ativado' : 'Som de Fundo Desativado';
+        if (this.settings.somFundoAtivo && this.settings.somAtivo) {
+            this.data.SONS.fundo.volume = this.settings.volumeMaster;
+            this.data.SONS.fundo.play();
         } else {
-            this.exibirMensagem(this.translate('missing', { amount: this.formatarNumero(custoAtual - this.state.energia) }), '#ff6347', true);
+            this.data.SONS.fundo.pause();
         }
+    },
+
+    atualizarVolume() {
+        this.settings.volumeMaster = this.elements.volumeMaster.value / 100;
+        this.elements.volumeValor.textContent = `${this.elements.volumeMaster.value}%`;
+        Object.values(this.data.SONS).forEach(som => som.volume = this.settings.volumeMaster);
+        if (this.settings.somFundoAtivo && this.settings.somAtivo) this.data.SONS.fundo.play();
     },
 
     // --- Funções de Evolução e Imagem ---
@@ -316,8 +193,7 @@ const Game = {
                 this.anunciarNovaEra(antiga, novaEraObj.nome);
                 this.exibirNarrativa('era', proximoIndex);
                 this.elements.eraAtual.textContent = novaEraObj.nome;
-                this.elements.tituloEmpresa.textContent = this.translate('companyTitle', { civilizationName: this.state.nomeCivilizacao, eraName: novaEraObj.nome });
-                Achievements.check(); // Verifica conquistas ao avançar de era
+                this.elements.tituloEmpresa.textContent = `🚀 ${this.state.nomeCivilizacao} - Era ${novaEraObj.nome}`;
             }
         }
         this.atualizarBarraProgresso();
@@ -334,7 +210,7 @@ const Game = {
         imgElement.classList.add('fade-out');
         setTimeout(() => {
             imgElement.onerror = () => {
-                Logger.warn(`[IMAGEM] Falha ao carregar ${novaImagemSrc}, usando fallback ${this.data.ERAS[0].imagem}`);
+                console.warn(`[IMAGEM] Falha ao carregar ${novaImagemSrc}, usando fallback ${this.data.ERAS[0].imagem}`);
                 imgElement.src = this.data.ERAS[0].imagem;
                 this.state.imagemAtual = this.data.ERAS[0].imagem.split('/').pop();
             };
@@ -362,82 +238,363 @@ const Game = {
                 this.elements.barraExpansao.max = maximo > 0 ? maximo : 1;
                 this.elements.barraExpansao.value = Math.max(0, Math.min(progresso, maximo));
                 this.elements.barraExpansao.setAttribute('aria-valuenow', progresso);
-                this.elements.progressoTexto.textContent = `${this.formatarNumero(progresso)} / ${this.formatarNumero(maximo)} ${this.translate('ofClicks')}`;
-                this.elements.progressoTexto.setAttribute('aria-label', `${this.translate('progress')}: ${this.formatarNumero(progresso)} ${this.translate('ofClicks')} ${this.formatarNumero(maximo)}`);
+                this.elements.progressoTexto.textContent = `${this.formatarNumero(progresso)} / ${this.formatarNumero(maximo)} cliques`;
+                this.elements.progressoTexto.setAttribute('aria-label', `Progresso: ${this.formatarNumero(progresso)} de ${this.formatarNumero(maximo)} cliques`);
             }
         } else {
             if (this.elements.barraExpansao) {
                 this.elements.barraExpansao.max = 1;
                 this.elements.barraExpansao.value = 1;
-                this.elements.progressoTexto.textContent = this.translate('eraMaxReached');
+                this.elements.progressoTexto.textContent = `Era Máxima Alcançada!`;
             }
         }
     },
 
     anunciarNovaEra(antigaEra, novaEra) {
-        this.exibirMensagem(this.translate('eraTransition', { oldEra: antigaEra, newEra: novaEra }), '#ffcc00');
+        this.exibirMensagem(`🎉 Parabéns! Você avançou da Era ${antigaEra} para a Era ${novaEra}!`, '#ffcc00');
         if (this.elements.tituloEmpresa) {
-            this.elements.tituloEmpresa.textContent = this.translate('companyTitle', { civilizationName: this.state.nomeCivilizacao, eraName: novaEra });
+            this.elements.tituloEmpresa.textContent = `🚀 ${this.state.nomeCivilizacao} - Era ${novaEra}`;
         }
     },
 
-    // --- Sistema de Narrativas ---
-    exibirNarrativa(triggerType, triggerId) {
-        const narrativa = this.data.NARRATIVAS.find(n => n.trigger === triggerType && n[triggerType === 'era' ? 'eraIndex' : 'id'] === triggerId);
-        if (narrativa) {
-            this.exibirMensagem(narrativa.texto, '#ADD8E6');
+    // --- Sistema de Conquistas CORRIGIDO ---
+    verificarConquistas() {
+        let novasConquistas = [];
+        
+        this.data.CONQUISTAS.forEach(c => {
+            if (!this.state.conquistasDesbloqueadas.includes(c.id) && c.condicao()) {
+                this.state.conquistasDesbloqueadas.push(c.id);
+                novasConquistas.push(c.nome);
+                this.tocarSom(this.data.SONS.conquista);
+            }
+        });
+
+        if (novasConquistas.length > 0) {
+            novasConquistas.forEach((nome, index) => {
+                setTimeout(() => {
+                    this.mostrarNotificacaoConquista(nome);
+                    this.exibirMensagem(`🏆 Conquista Desbloqueada: ${nome}!`, '#FFD700');
+                }, index * 1500);
+            });
+            this.renderizarConquistas();
+        }
+    },
+
+    mostrarNotificacaoConquista(nome) {
+        const notificacao = this.elements.achievementNotification;
+        if (notificacao) {
+            notificacao.innerHTML = `🏆 ${nome}`;
+            notificacao.classList.remove('hidden');
+            
+            // Adiciona animação de brilho dourado
+            notificacao.style.background = 'linear-gradient(45deg, #FFD700, #FFA500)';
+            notificacao.style.boxShadow = '0 0 30px rgba(255, 215, 0, 0.8)';
+            
+            setTimeout(() => {
+                notificacao.classList.add('hidden');
+            }, 3000);
+        }
+    },
+
+    renderizarConquistas() {
+        // Renderiza conquistas na tela inicial
+        this.renderizarConquistasContainer(this.elements.conquistasContainer, 'conquistas-lista');
+        // Renderiza conquistas no jogo
+        this.renderizarConquistasContainer(this.elements.conquistasContainerGame, 'conquistas-lista-game');
+    },
+
+    renderizarConquistasContainer(container, listaId) {
+        if (!container) return;
+        
+        let lista = container.querySelector(`#${listaId}`);
+        if (!lista) {
+            lista = document.createElement('div');
+            lista.id = listaId;
+            lista.className = 'conquistas-lista';
+            container.appendChild(lista);
+        }
+        
+        lista.innerHTML = '';
+        
+        this.data.CONQUISTAS.forEach(c => {
+            const isDesbloqueada = this.state.conquistasDesbloqueadas.includes(c.id);
+            const card = document.createElement('div');
+            card.className = `conquista-card ${isDesbloqueada ? 'comprado' : ''}`;
+            card.innerHTML = `
+                <h3>${c.nome}</h3>
+                <p>${c.descricao}</p>
+                <p class="status">${isDesbloqueada ? '🏆 DESBLOQUEADA!' : '🔒 BLOQUEADA'}</p>
+            `;
+            lista.appendChild(card);
+        });
+    },
+
+    toggleConquistas(container, botao) {
+        if (!container || !botao) return;
+        
+        if (container.classList.contains('hidden')) {
+            container.classList.remove('hidden');
+            botao.textContent = 'Esconder Conquistas';
+            // Força re-renderização para garantir que estejam atualizadas
+            this.renderizarConquistas();
+        } else {
+            container.classList.add('hidden');
+            botao.textContent = 'Ver Conquistas';
+        }
+    },
+
+    toggleConquistasInicio() {
+        this.toggleConquistas(this.elements.conquistasContainer, this.elements.btnToggleConquistas);
+    },
+
+    toggleConquistasGame() {
+        this.toggleConquistas(this.elements.conquistasContainerGame, this.elements.btnToggleConquistasGame);
+    },
+
+    // --- Loop Principal ---
+    updateLoop(timestamp) {
+        if (!this.settings.pausado && timestamp - this.settings.ultimoUpdate > 1000) {
+            this.coletarRendaAutomatica();
+            this.aumentarTempo();
+            this.atualizarExibicao();
+            this.verificarConquistas();
+            this.settings.ultimoUpdate = timestamp;
+        }
+        requestAnimationFrame(this.updateLoop.bind(this));
+    },
+
+    // --- Geração de Estrelas ---
+    generarEstrelas() {
+        for (let i = 0; i < 5; i++) {
+            const estrela = document.createElement('div');
+            estrela.className = 'estrela-cadente';
+            estrela.style.left = `${Math.random() * 100}%`;
+            estrela.style.top = `-${Math.random() * 20}%`;
+            estrela.style.animationDelay = `${Math.random() * 10}s`;
+            document.body.appendChild(estrela);
         }
     },
 
     // --- Eventos Aleatórios ---
     iniciarEventosAleatorios() {
-        setInterval(() => {
-            if (this.settings.pausado) return;
-            if (Math.random() < 0.1) { // 10% de chance a cada 30 segundos
-                this.ativarEventoAleatorio();
-            }
-        }, 30000);
+        const intervalo = Math.random() * (40000 - 20000) + 20000;
+        setTimeout(this.ativarEventoAleatorio.bind(this), intervalo);
     },
 
     ativarEventoAleatorio() {
-        const evento = this.data.EVENTOS_ALEATORIOS[Math.floor(Math.random() * this.data.EVENTOS_ALEATORIOS.length)];
-        this.settings.eventoAtual = evento;
-        this.exibirMensagem(evento.mensagem, '#FF8C00');
-        AudioManager.playSound(evento.nome.toLowerCase().replace(/ /g, '')); // Toca som baseado no nome do evento
+        if (this.settings.eventoAtual || this.settings.pausado) {
+            this.iniciarEventosAleatorios();
+            return;
+        }
 
-        switch (evento.efeito.tipo) {
+        const eventoEscolhido = this.data.EVENTOS_ALEATORIOS[Math.floor(Math.random() * this.data.EVENTOS_ALEATORIOS.length)];
+        this.settings.eventoAtual = eventoEscolhido;
+        this.exibirMensagem(eventoEscolhido.mensagem, '#00ffcc');
+        this.exibirNarrativa('evento', eventoEscolhido.nome);
+        this.tocarSom(this.data.SONS.cometa);
+
+        switch (eventoEscolhido.efeito.tipo) {
             case 'multiplicador_clique':
-                this.state.multiplicadorCliquesAtivo *= evento.efeito.valor;
+                this.state.multiplicadorCliquesAtivo = eventoEscolhido.efeito.valor;
                 setTimeout(() => {
-                    this.state.multiplicadorCliquesAtivo /= evento.efeito.valor;
-                    this.exibirMensagem(`Efeito de ${evento.nome} terminou.`, '#FFD700');
-                }, evento.efeito.duracao * 1000);
+                    this.state.multiplicadorCliquesAtivo = 1;
+                    this.exibirMensagem('Multiplicador de cliques normalizado.', '#ffcc66');
+                    this.settings.eventoAtual = null;
+                    this.iniciarEventosAleatorios();
+                }, eventoEscolhido.efeito.duracao * 1000);
                 break;
             case 'energia_instantanea':
-                this.state.energia += evento.efeito.valor;
+                this.state.energia += eventoEscolhido.efeito.valor;
+                this.exibirTextoFlutuante(eventoEscolhido.efeito.valor, { clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
+                this.settings.eventoAtual = null;
+                this.iniciarEventosAleatorios();
                 break;
             case 'multiplicador_renda':
-                this.state.multiplicadorRendaAtivo *= evento.efeito.valor;
+                this.state.multiplicadorRendaAtivo = eventoEscolhido.efeito.valor;
                 setTimeout(() => {
-                    this.state.multiplicadorRendaAtivo /= evento.efeito.valor;
-                    this.exibirMensagem(`Efeito de ${evento.nome} terminou.`, '#FFD700');
-                }, evento.efeito.duracao * 1000);
+                    this.state.multiplicadorRendaAtivo = 1;
+                    this.exibirMensagem('Multiplicador de renda normalizado.', '#ffcc66');
+                    this.settings.eventoAtual = null;
+                    this.iniciarEventosAleatorios();
+                }, eventoEscolhido.efeito.duracao * 1000);
                 break;
         }
+    },
+
+    // --- Narrativa ---
+    exibirNarrativa(trigger, detalhes) {
+        const narrativa = this.data.NARRATIVAS.find(n => {
+            if (trigger === 'era') return n.trigger === 'era' && n.eraIndex === detalhes;
+            if (trigger === 'upgrade') return n.trigger === 'upgrade' && n.id === detalhes;
+            if (trigger === 'evento') return n.trigger === 'evento' && n.nome === detalhes;
+        });
+        if (narrativa) {
+            this.exibirMensagem(narrativa.texto, '#ffffff', false);
+            if (this.elements.mensagem) this.elements.mensagem.classList.add('narrativa');
+            setTimeout(() => { if (this.elements.mensagem) this.elements.mensagem.classList.remove('narrativa'); }, 2500);
+        }
+    },
+
+    // --- Funções de Jogo ---
+    coletarEnergia(event) {
+        if (this.settings.pausado) return;
+
+        this.state.cliques++;
+        let energiaGanho = this.state.energiaPorClique * this.state.multiplicadorCliquesTotal * this.state.multiplicadorCliquesAtivo;
+        if (this.settings.TEST_FAST_ERAS) energiaGanho *= this.settings.TEST_CLIQUES_POR_CLIQUE;
+        this.state.energia += energiaGanho;
+        this.tocarSom(this.data.SONS.click);
+        this.exibirTextoFlutuante(energiaGanho, event);
+        this.elements.universoImg.classList.add('clique-impacto');
+        setTimeout(() => this.elements.universoImg.classList.remove('clique-impacto'), 100);
         this.atualizarExibicao();
+        this.tentarAvancarEra();
+    },
+
+    aplicarEfeito(efeito, tocarSomUpgrade = true) {
+        if (efeito.energiaPorClique) this.state.energiaPorClique += efeito.energiaPorClique;
+        if (efeito.rendaAutomatica) this.state.rendaAutomatica += efeito.rendaAutomatica;
+        if (efeito.multiplicadorCliquesTotal) this.state.multiplicadorCliquesTotal *= efeito.multiplicadorCliquesTotal;
+        if (efeito.multiplicadorRendaTotal) this.state.multiplicadorRendaTotal *= efeito.multiplicadorRendaTotal;
+        if (tocarSomUpgrade) this.tocarSom(this.data.SONS.upgrade);
+    },
+
+    comprarUpgrade(upgradeId) {
+        const upgrade = this.data.UPGRADES_CONFIG.find(u => u.id === upgradeId);
+        if (!upgrade) return;
+
+        const currentUpgradeState = this.state.upgradesComprados[upgrade.id] || { comprados: 0, custo: upgrade.baseCusto };
+        const custoAtual = currentUpgradeState.custo;
+
+        if (this.state.energia < custoAtual) {
+            // ANIMAÇÃO E SOM DE ERRO CORRIGIDOS
+            this.tocarSom(this.data.SONS.erro);
+            this.exibirMensagem('Energia insuficiente!', '#ff6347', true);
+            
+            const card = document.getElementById(`card-${upgrade.id}`);
+            if (card) {
+                card.classList.add('erro');
+                setTimeout(() => card.classList.remove('erro'), 1000);
+            }
+            
+            const button = document.getElementById(`btn-${upgrade.id}`);
+            if (button) {
+                button.classList.add('insuficiente');
+                setTimeout(() => {
+                    if (this.state.energia < custoAtual) {
+                        button.classList.add('insuficiente');
+                    }
+                }, 1000);
+            }
+            return;
+        }
+
+        // COMPRA BEM-SUCEDIDA
+        this.state.energia -= custoAtual;
+        
+        if (!this.state.upgradesComprados[upgrade.id]) {
+            this.state.upgradesComprados[upgrade.id] = { comprados: 0, custo: upgrade.baseCusto };
+        }
+        this.state.upgradesComprados[upgrade.id].comprados++;
+        
+        this.aplicarEfeito(upgrade.efeito);
+        
+        if (upgrade.multiplicavel) {
+            const novoCusto = Math.floor(upgrade.baseCusto * Math.pow(1.15, this.state.upgradesComprados[upgrade.id].comprados));
+            upgrade.custo = novoCusto;
+            this.state.upgradesComprados[upgrade.id].custo = novoCusto;
+        }
+
+        this.atualizarExibicao();
+        this.exibirNarrativa('upgrade', upgradeId);
+
+        const card = document.getElementById(`card-${upgrade.id}`);
+        if (card) {
+            card.classList.add('feedback-compra');
+            setTimeout(() => card.classList.remove('feedback-compra'), 1000);
+        }
+        
+        this.exibirTextoFlutuante('Upgrade Comprado!', { clientX: window.innerWidth/2, clientY: window.innerHeight/2 });
+    },
+
+    coletarRendaAutomatica() {
+        if (this.settings.pausado) return;
+        
+        let rendaTotal = this.state.rendaAutomatica * this.state.multiplicadorRendaTotal * this.state.multiplicadorRendaAtivo;
+        const energiaGanho = Math.round(rendaTotal);
+        this.state.energia += energiaGanho;
+        
+        this.coletarRendaAutomaticaVisual(energiaGanho);
+    },
+
+    coletarRendaAutomaticaVisual(energiaGanho) {
+        if (energiaGanho <= 0) return;
+        
+        const flutuante = document.createElement('span');
+        flutuante.textContent = `+${this.formatarNumero(energiaGanho)}`;
+        flutuante.className = 'flying-text auto-income-text';
+        
+        const painelStatus = this.elements.painelStatus || document.querySelector('.painel-status');
+        if (painelStatus) {
+            const rect = painelStatus.getBoundingClientRect();
+            flutuante.style.left = `${rect.left + rect.width / 2}px`;
+            flutuante.style.top = `${rect.top + 50}px`;
+        } else {
+            flutuante.style.left = `${window.innerWidth / 2}px`;
+            flutuante.style.top = `${window.innerHeight / 2}px`;
+        }
+
+        document.body.appendChild(flutuante);
+        setTimeout(() => flutuante.remove(), 1500);
+    },
+
+    aumentarTempo() {
+        if (this.settings.pausado) return;
+        this.state.tempoDecorrido++;
+        if (this.elements.timerSpan) this.elements.timerSpan.textContent = this.formatarTempo(this.state.tempoDecorrido);
+    },
+
+    // --- Navegação Rápida ---
+    rolarParaUpgrades() {
+        const upgradesContainer = this.elements.upgradesContainer;
+        if (upgradesContainer) upgradesContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+
+    rolarParaStatus() {
+        const status = this.elements.painelStatus;
+        if (status) status.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+
+    gerenciarBotoesDeRolagem() {
+        if (!this.elements.btnIrParaUpgrades || !this.elements.btnIrParaStatus) return;
+
+        const upgradesSection = this.elements.upgradesContainer;
+        if (!upgradesSection) return;
+
+        const upgradesY = upgradesSection.offsetTop;
+        const rolagemAtual = window.scrollY;
+
+        if (rolagemAtual > upgradesY - 200) {
+            if (this.elements.telaJogo && !this.elements.telaJogo.classList.contains('hidden')) {
+                this.elements.btnIrParaUpgrades.classList.add('hidden');
+                this.elements.btnIrParaStatus.classList.remove('hidden');
+            }
+        } else {
+            if (this.elements.telaJogo && !this.elements.telaJogo.classList.contains('hidden')) {
+                this.elements.btnIrParaUpgrades.classList.remove('hidden');
+                this.elements.btnIrParaStatus.classList.add('hidden');
+            }
+        }
     },
 
     // --- Exibição e UI ---
     atualizarExibicao() {
         if (!this.elements.dinheiroSpan) return;
         this.elements.dinheiroSpan.textContent = this.formatarNumero(this.state.energia);
-        this.elements.dinheiroSpan.setAttribute('aria-label', `${this.translate('energy')}: ${this.formatarNumero(this.state.energia)}`);
+        this.elements.dinheiroSpan.setAttribute('aria-label', `Energia atual: ${this.formatarNumero(this.state.energia)}`);
 
         if (this.elements.contadorCliquesStatus) {
             this.elements.contadorCliquesStatus.textContent = this.formatarNumero(this.state.cliques);
-        }
-        if (this.elements.rendaPorSegundoSpan) {
-            this.elements.rendaPorSegundoSpan.textContent = this.formatarNumero(this.state.rendaAutomatica * this.state.multiplicadorRendaTotal * this.state.multiplicadorRendaAtivo);
         }
 
         this.desabilitarUpgrades();
@@ -445,10 +602,7 @@ const Game = {
     },
 
     carregarUpgrades() {
-        // Limpa as abas antes de carregar
-        Object.values(this.elements.tabs).forEach(tab => {
-            if (tab) tab.innerHTML = '';
-        });
+        if (!this.elements.tabs.clique || this.elements.tabs.clique.children.length > 0) return;
 
         this.data.UPGRADES_CONFIG.forEach(upgrade => {
             if (!this.state.upgradesComprados[upgrade.id]) {
@@ -466,20 +620,18 @@ const Game = {
             button.type = 'button';
             button.id = `btn-${upgrade.id}`;
             button.className = 'btn btn-upgrade btn-with-counter';
-            button.textContent = this.translate('buy');
-            button.setAttribute('aria-label', `${this.translate('buy')} ${upgrade.nome} ${this.translate('for')} ${this.formatarNumero(displayCusto)} ${this.translate('energy')}`);
+            button.textContent = `Comprar`;
+            button.setAttribute('aria-label', `Comprar ${upgrade.nome} por ${this.formatarNumero(displayCusto)} energia`);
 
-            // Delegação de eventos: Adiciona o listener ao container pai, não a cada botão
-            // Isso será tratado na inicialização geral, aqui apenas para garantir que o botão exista
-            // button.addEventListener('click', () => this.comprarUpgrade(upgrade.id));
+            button.addEventListener('click', () => this.comprarUpgrade(upgrade.id));
 
             const isMultiplicavel = upgrade.multiplicavel;
             const contadorHtml = isMultiplicavel ? `<span class="upgrade-contador" id="contador-${upgrade.id}">x ${displayComprados}</span>` : '';
             
             upgradeCard.innerHTML = `
-                <h3>${this.translate(upgrade.id)}</h3>
+                <h3>${upgrade.nome}</h3>
                 <p>${upgrade.descricao}</p>
-                <p class="custo-upgrade">${this.translate('cost')}: ⚡ <span id="custo-display-${upgrade.id}">${this.formatarNumero(displayCusto)}</span></p>
+                <p class="custo-upgrade">Custo: ⚡ <span id="custo-display-${upgrade.id}">${this.formatarNumero(displayCusto)}</span></p>
             `;
             
             const buttonWrapper = document.createElement('div');
@@ -512,13 +664,13 @@ const Game = {
 
             if (upgrade.multiplicavel) {
                 button.disabled = false;
-                button.textContent = this.translate('buy');
+                button.textContent = `Comprar`;
                 button.classList.remove('comprado');
 
                 if (!podeComprar) {
                     button.classList.add('insuficiente');
                     const falta = custoAtual - this.state.energia;
-                    button.textContent = `${this.translate('missing')} ${this.formatarNumero(falta)}`;
+                    button.textContent = `Falta ${this.formatarNumero(falta)}`;
                 } else {
                     button.classList.remove('insuficiente');
                 }
@@ -529,17 +681,17 @@ const Game = {
             } else if (jaComprado) {
                 button.disabled = true;
                 button.classList.remove('insuficiente');
-                button.textContent = this.translate('bought');
-                if (custoTextoSpan) custoTextoSpan.textContent = this.translate('permanent');
+                button.textContent = 'Comprado';
+                if (custoTextoSpan) custoTextoSpan.textContent = 'Permanente';
                 if (card) card.classList.add('comprado');
             } else {
                 button.disabled = false;
-                button.textContent = this.translate('buy');
+                button.textContent = `Comprar`;
                 
                 if (!podeComprar) {
                     button.classList.add('insuficiente');
                     const falta = custoAtual - this.state.energia;
-                    button.textContent = `${this.translate('missing')} ${this.formatarNumero(falta)}`;
+                    button.textContent = `Falta ${this.formatarNumero(falta)}`;
                 } else {
                     button.classList.remove('insuficiente');
                 }
@@ -597,16 +749,16 @@ const Game = {
     togglePausa() {
         this.settings.pausado = !this.settings.pausado;
         if (this.settings.pausado) {
-            this.exibirMensagem(this.translate('gamePaused'), '#ffcc66');
-            AudioManager.sounds.fundo.pause();
+            this.exibirMensagem("Jogo pausado.", '#ffcc66');
+            if (this.settings.somAtivo && this.settings.somFundoAtivo) this.data.SONS.fundo.pause();
         } else {
-            this.exibirMensagem(this.translate('gameResumed'), '#00ffcc');
-            if (this.settings.somAtivo && this.settings.somFundoAtivo) AudioManager.sounds.fundo.play();
+            this.exibirMensagem("Jogo retomado!", '#00ffcc');
+            if (this.settings.somAtivo && this.settings.somFundoAtivo) this.data.SONS.fundo.play();
         }
     },
 
     reiniciarJogo() {
-        if (confirm(this.translate('confirmReset'))) {
+        if (confirm('Tem certeza que deseja reiniciar o jogo? Todo o progresso será perdido!')) {
             localStorage.removeItem('galaxiaClickerSave');
             location.reload();
         }
@@ -619,41 +771,20 @@ const Game = {
         this.elements.telaInicio.classList.add('hidden');
         this.elements.telaJogo.classList.remove('hidden');
         if (this.elements.tituloEmpresa) {
-            this.elements.tituloEmpresa.textContent = this.translate('companyTitle', { civilizationName: this.state.nomeCivilizacao, eraName: this.data.ERAS[this.state.eraIndex].nome });
+            this.elements.tituloEmpresa.textContent = `🚀 ${this.state.nomeCivilizacao} - Era ${this.data.ERAS[this.state.eraIndex].nome}`;
         }
 
-        // Inicializa módulos
-        AudioManager.init(this);
-        Achievements.init(this);
-
-        if (this.settings.somAtivo && this.settings.somFundoAtivo) AudioManager.sounds.fundo.play();
+        this.inicializarSons();
+        if (this.settings.somAtivo && this.settings.somFundoAtivo) this.data.SONS.fundo.play();
 
         this.carregarUpgrades();
         this.desabilitarUpgrades();
         this.generarEstrelas();
         this.iniciarEventosAleatorios();
-        // Inicia o loop principal com requestAnimationFrame
-        requestAnimationFrame(this.gameLoop.bind(this));
+        requestAnimationFrame(this.updateLoop.bind(this));
         this.carregarJogo();
-        Achievements.render();
+        this.renderizarConquistas();
         this.atualizarExibicao();
-
-        // Adiciona delegação de eventos para upgrades
-        this.elements.upgradesContainer.addEventListener('click', (event) => {
-            const button = event.target.closest('.btn-upgrade');
-            if (button && !button.disabled) {
-                const upgradeId = button.id.replace('btn-', '');
-                this.comprarUpgrade(upgradeId);
-            }
-        });
-
-        // Adiciona listeners para os botões de som e volume
-        this.elements.btnToggleSomGeral.addEventListener('click', () => AudioManager.toggleGlobalSound());
-        this.elements.btnToggleSomFundo.addEventListener('click', () => AudioManager.toggleBackgroundSound());
-        this.elements.volumeMaster.addEventListener('input', () => AudioManager.updateVolume());
-
-        // Listener para o botão de conquistas em jogo
-        this.elements.btnConquistasGame.addEventListener('click', () => Achievements.toggleVisibility(this.elements.conquistasContainerGame));
     },
 
     // --- Persistência de Dados ---
@@ -661,20 +792,19 @@ const Game = {
         try {
             const saveState = {
                 state: this.state,
-                upgradesConfigState: this.data.UPGRADES_CONFIG.map(u => ({
-                    id: u.id,
-                    comprados: (this.state.upgradesComprados[u.id] ? this.state.upgradesComprados[u.id].comprados : 0),
-                    custo: (this.state.upgradesComprados[u.id] ? this.state.upgradesComprados[u.id].custo : u.baseCusto)
+                upgradesConfigState: this.data.UPGRADES_CONFIG.map(u => ({ 
+                    id: u.id, 
+                    comprados: (this.state.upgradesComprados[u.id] ? this.state.upgradesComprados[u.id].comprados : 0), 
+                    custo: (this.state.upgradesComprados[u.id] ? this.state.upgradesComprados[u.id].custo : u.baseCusto) 
                 }))
             };
             localStorage.setItem('galaxiaClickerSave', JSON.stringify(saveState));
             this.elements.mensagemSalvar.classList.remove('hidden');
             setTimeout(() => this.elements.mensagemSalvar.classList.add('hidden'), 2000);
-            AudioManager.playSound('salvar');
-            Logger.info('Jogo salvo com sucesso.');
+            this.tocarSom(this.data.SONS.salvar);
         } catch (e) {
-            Logger.error(`Erro ao salvar o jogo: ${e.message}`);
-            this.exibirMensagem(this.translate('errorSaving'), '#ff6347', true);
+            console.error("Erro ao salvar o jogo:", e);
+            this.exibirMensagem("Erro ao salvar o jogo!", '#ff6347', true);
         }
     },
 
@@ -699,21 +829,18 @@ const Game = {
                 }
                 this.elements.eraAtual.textContent = this.data.ERAS[this.state.eraIndex].nome;
                 this.elements.universoImg.src = this.data.ERAS[this.state.eraIndex].imagem;
-                this.elements.tituloEmpresa.textContent = this.translate('companyTitle', { civilizationName: this.state.nomeCivilizacao, eraName: this.data.ERAS[this.state.eraIndex].nome });
-                AudioManager.updateVolume(); // Atualiza volume após carregar
-                Achievements.render(); // Renderiza conquistas após carregar
-                Logger.info('Jogo carregado com sucesso.');
+                this.elements.tituloEmpresa.textContent = `🚀 ${this.state.nomeCivilizacao} - Era ${this.data.ERAS[this.state.eraIndex].nome}`;
+                this.atualizarVolume();
+                this.renderizarConquistas();
             }
         } catch (e) {
-            Logger.error(`Erro ao carregar o jogo: ${e.message}`);
-            this.exibirMensagem(this.translate('errorLoading'), '#ff6347', true);
+            console.error("Erro ao carregar o jogo:", e);
+            this.exibirMensagem("Erro ao carregar o jogo!", '#ff6347', true);
         }
     },
 
-    // --- Inicialização ---
+    // --- Inicialização CORRIGIDA ---
     init() {
-        Logger.info('Iniciando Galáxia Clicker...');
-
         // Pré-carrega imagens das eras
         this.data.ERAS.forEach(e => {
             const img = new Image();
@@ -726,16 +853,14 @@ const Game = {
             if (!u.baseCusto) u.baseCusto = u.custo;
         });
 
-        // Mapeia os elementos do DOM
+        // Mapeia os elementos do DOM - CORRIGIDO para incluir conquistas
         this.elements = {
             telaInicio: document.getElementById('telaInicio'),
             telaJogo: document.getElementById('jogo'),
             nomeEmpresaInput: document.getElementById('nomeEmpresa'),
-            btnIniciarJogo: document.getElementById('btnIniciarJogo'),
             tituloEmpresa: document.getElementById('tituloEmpresa'),
             dinheiroSpan: document.getElementById('dinheiro'),
             contadorCliquesStatus: document.getElementById('move-counter-status'),
-            rendaPorSegundoSpan: document.getElementById('renda-por-segundo'),
             timerSpan: document.getElementById('timer'),
             barraExpansao: document.getElementById('barraExpansao'),
             progressoTexto: document.getElementById('progresso-texto'),
@@ -747,127 +872,120 @@ const Game = {
                 automatica: document.getElementById('automatica-tab'),
                 expansao: document.getElementById('expansao-tab')
             },
-            tabButtons: {
-                clique: document.getElementById('btn-tab-clique'),
-                automatica: document.getElementById('btn-tab-automatica'),
-                expansao: document.getElementById('btn-tab-expansao')
-            },
+            mensagemSalvar: document.getElementById('mensagem-salvar'),
+            iniciarJogoBtn: document.getElementById('iniciar-jogo-btn'),
             btnSalvar: document.getElementById('btnSalvar'),
             btnReiniciar: document.getElementById('btnReiniciar'),
-            btnPausar: document.getElementById('btnPausar'),
             btnToggleSomGeral: document.getElementById('btnToggleSomGeral'),
             btnToggleSomFundo: document.getElementById('btnToggleSomFundo'),
             volumeMaster: document.getElementById('volumeMaster'),
             volumeValor: document.getElementById('volumeValor'),
-            painelStatus: document.getElementById('painel-status'),
-            upgradesContainer: document.getElementById('upgrades-container'),
-            achievementNotification: document.getElementById('achievement-notification'),
-            conquistasContainer: document.getElementById('conquistas-container'), // Tela inicial
-            conquistasContainerGame: document.getElementById('conquistas-container-game'), // Em jogo
-            btnConquistasInicial: document.getElementById('btnConquistasInicial'),
-            btnConquistasGame: document.getElementById('btnConquistasGame'),
-            // Adicionar elementos para navegação rápida
+            ultimaMensagemErro: document.getElementById('ultimaMensagemErro'),
             btnIrParaUpgrades: document.getElementById('btnIrParaUpgrades'),
             btnIrParaStatus: document.getElementById('btnIrParaStatus'),
-            // Adicionar elemento para o clique principal
-            mainClickArea: document.getElementById('main-click-area')
+            btnToggleControleSom: document.getElementById('btnToggleControleSom'),
+            controleSomContainer: document.getElementById('controle-som-container'),
+            btnToggleConquistas: document.getElementById('btnToggleConquistas'),
+            conquistasContainer: document.getElementById('conquistas-container'),
+            conquistasContainerGame: document.getElementById('conquistas-container-game'),
+            achievementNotification: document.getElementById('achievement-notification'),
+            painelStatus: document.querySelector('.painel-status'),
+            upgradesContainer: document.getElementById('upgrades-container')
         };
 
-        // Atribui textos traduzidos aos elementos estáticos
-        document.title = this.translate('gameTitle');
-        if (this.elements.telaInicio) this.elements.telaInicio.querySelector('h1').textContent = this.translate('startScreenTitle');
-        if (this.elements.nomeEmpresaInput) this.elements.nomeEmpresaInput.placeholder = this.translate('enterName');
-        if (this.elements.btnIniciarJogo) this.elements.btnIniciarJogo.textContent = this.translate('startGame');
-        if (document.getElementById('upgrades-title')) document.getElementById('upgrades-title').textContent = this.translate('upgrades');
-        if (document.getElementById('achievements-title')) document.getElementById('achievements-title').textContent = this.translate('achievements');
-        if (document.getElementById('settings-title')) document.getElementById('settings-title').textContent = this.translate('settings');
-        if (this.elements.tabButtons.clique) this.elements.tabButtons.clique.textContent = this.translate('clickUpgrades');
-        if (this.elements.tabButtons.automatica) this.elements.tabButtons.automatica.textContent = this.translate('autoUpgrades');
-        if (this.elements.tabButtons.expansao) this.elements.tabButtons.expansao.textContent = this.translate('expansionUpgrades');
-        if (this.elements.btnReiniciar) this.elements.btnReiniciar.textContent = this.translate('resetGame');
-        if (this.elements.btnPausar) this.elements.btnPausar.textContent = this.translate('pauseGame');
-        if (this.elements.btnToggleSomGeral) this.elements.btnToggleSomGeral.textContent = this.settings.somAtivo ? this.translate('soundOn') : this.translate('soundOff');
-        if (this.elements.btnToggleSomFundo) this.elements.btnToggleSomFundo.textContent = this.settings.somFundoAtivo ? this.translate('musicOn') : this.translate('musicOff');
-        if (document.getElementById('volume-label')) document.getElementById('volume-label').textContent = this.translate('volume');
-        if (this.elements.btnConquistasInicial) this.elements.btnConquistasInicial.textContent = this.translate('achievements');
-        if (this.elements.btnConquistasGame) this.elements.btnConquistasGame.textContent = this.translate('achievements');
-
-        // Adiciona listeners de eventos
-        this.elements.btnIniciarJogo.addEventListener('click', () => this.iniciarJogo());
-        this.elements.btnSalvar.addEventListener('click', () => this.salvarJogo());
-        this.elements.btnReiniciar.addEventListener('click', () => this.reiniciarJogo());
-        this.elements.btnPausar.addEventListener('click', () => this.togglePausa());
-        this.elements.mainClickArea.addEventListener('click', (event) => this.clicar(event));
-
-        // Listeners para as abas de upgrades
-        this.elements.tabButtons.clique.addEventListener('click', () => this.mudarAba('clique-tab', this.elements.tabButtons.clique));
-        this.elements.tabButtons.automatica.addEventListener('click', () => this.mudarAba('automatica-tab', this.elements.tabButtons.automatica));
-        this.elements.tabButtons.expansao.addEventListener('click', () => this.mudarAba('expansao-tab', this.elements.tabButtons.expansao));
-
-        // Listeners para os botões de rolagem
-        if (this.elements.btnIrParaUpgrades) this.elements.btnIrParaUpgrades.addEventListener('click', () => this.rolarParaUpgrades());
-        if (this.elements.btnIrParaStatus) this.elements.btnIrParaStatus.addEventListener('click', () => this.rolarParaStatus());
-        window.addEventListener('scroll', () => this.gerenciarBotoesDeRolagem());
-
-        // Listener para o botão de conquistas na tela inicial
-        this.elements.btnConquistasInicial.addEventListener('click', () => Achievements.toggleVisibility(this.elements.conquistasContainer));
-
-        // Carrega o jogo salvo ou inicia um novo
-        this.carregarJogo();
-        Achievements.render(); // Renderiza conquistas iniciais
-        this.mudarAba('clique-tab', this.elements.tabButtons.clique); // Abre a primeira aba por padrão
-
-        Logger.info('Galáxia Clicker inicializado.');
-    },
-
-    // --- Geração de Estrelas (Visual) ---
-    generarEstrelas() {
-        const starContainer = document.getElementById('star-background');
-        if (!starContainer) return;
-        for (let i = 0; i < 100; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.left = `${Math.random() * 100}vw`;
-            star.style.top = `${Math.random() * 100}vh`;
-            star.style.animationDuration = `${Math.random() * 5 + 5}s`;
-            starContainer.appendChild(star);
-        }
-    },
-
-    // --- Funções de Navegação Rápida ---
-    rolarParaUpgrades() {
-        const upgradesContainer = this.elements.upgradesContainer;
-        if (upgradesContainer) upgradesContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    },
-
-    rolarParaStatus() {
-        const status = this.elements.painelStatus;
-        if (status) status.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    },
-
-    gerenciarBotoesDeRolagem() {
-        if (!this.elements.btnIrParaUpgrades || !this.elements.btnIrParaStatus) return;
-
-        const upgradesSection = this.elements.upgradesContainer;
-        if (!upgradesSection) return;
-
-        const upgradesY = upgradesSection.offsetTop;
-        const rolagemAtual = window.scrollY;
-
-        if (rolagemAtual > upgradesY - 200) {
-            if (this.elements.telaJogo && !this.elements.telaJogo.classList.contains('hidden')) {
-                this.elements.btnIrParaUpgrades.classList.add('hidden');
-                this.elements.btnIrParaStatus.classList.remove('hidden');
+        // CORREÇÃO: Cria botão de conquistas no jogo se não existir
+        if (!document.getElementById('btnToggleConquistasGame')) {
+            const btnConquistasGame = document.createElement('button');
+            btnConquistasGame.id = 'btnToggleConquistasGame';
+            btnConquistasGame.className = 'btn btn-toggle-conquistas';
+            btnConquistasGame.textContent = 'Ver Conquistas';
+            
+            const conquistasContainerGame = this.elements.conquistasContainerGame;
+            if (conquistasContainerGame && conquistasContainerGame.parentNode) {
+                conquistasContainerGame.parentNode.insertBefore(btnConquistasGame, conquistasContainerGame);
+                this.elements.btnToggleConquistasGame = btnConquistasGame;
             }
         } else {
-            if (this.elements.telaJogo && !this.elements.telaJogo.classList.contains('hidden')) {
-                this.elements.btnIrParaUpgrades.classList.remove('hidden');
-                this.elements.btnIrParaStatus.classList.add('hidden');
-            }
+            this.elements.btnToggleConquistasGame = document.getElementById('btnToggleConquistasGame');
         }
-    },
+
+        // Verifica URL params para modo de teste
+        const urlParams = new URLSearchParams(window.location.search);
+        this.settings.TEST_FAST_ERAS = urlParams.get('test') === 'true';
+
+        // Adiciona os event listeners - CORRIGIDO para conquistas
+        if (this.elements.iniciarJogoBtn) this.elements.iniciarJogoBtn.addEventListener('click', this.iniciarJogo.bind(this));
+        if (this.elements.btnSalvar) this.elements.btnSalvar.addEventListener('click', this.salvarJogo.bind(this));
+        if (this.elements.btnReiniciar) this.elements.btnReiniciar.addEventListener('click', this.reiniciarJogo.bind(this));
+        if (this.elements.btnToggleSomGeral) this.elements.btnToggleSomGeral.addEventListener('click', this.toggleSomGeral.bind(this));
+        if (this.elements.btnToggleSomFundo) this.elements.btnToggleSomFundo.addEventListener('click', this.toggleSomFundo.bind(this));
+        if (this.elements.volumeMaster) this.elements.volumeMaster.addEventListener('input', this.atualizarVolume.bind(this));
+        if (this.elements.btnIrParaUpgrades) this.elements.btnIrParaUpgrades.addEventListener('click', this.rolarParaUpgrades.bind(this));
+        if (this.elements.btnIrParaStatus) this.elements.btnIrParaStatus.addEventListener('click', this.rolarParaStatus.bind(this));
+        window.addEventListener('scroll', this.gerenciarBotoesDeRolagem.bind(this));
+        
+        // Event listeners para conquistas - CORRIGIDO
+        if (this.elements.btnToggleConquistas) {
+            this.elements.btnToggleConquistas.addEventListener('click', this.toggleConquistasInicio.bind(this));
+        }
+        if (this.elements.btnToggleConquistasGame) {
+            this.elements.btnToggleConquistasGame.addEventListener('click', this.toggleConquistasGame.bind(this));
+        }
+        
+        if (this.elements.telaJogo) {
+            this.elements.telaJogo.addEventListener('click', (event) => {
+                if (!event.target.closest('.btn') && !event.target.closest('.upgrade-card')) {
+                    this.coletarEnergia(event);
+                }
+            });
+        }
+
+        if (this.elements.universoImg) {
+            this.elements.universoImg.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.coletarEnergia(e);
+            });
+        }
+
+        document.getElementById('tab-btn-clique')?.addEventListener('click', (e) => this.mudarAba('clique-tab', e.target));
+        document.getElementById('tab-btn-automatica')?.addEventListener('click', (e) => this.mudarAba('automatica-tab', e.target));
+        document.getElementById('tab-btn-expansao')?.addEventListener('click', (e) => this.mudarAba('expansao-tab', e.target));
+        this.mudarAba('clique-tab', document.getElementById('tab-btn-clique'));
+
+        if (this.elements.btnToggleControleSom) {
+            this.elements.btnToggleControleSom.addEventListener('click', () => {
+                if (this.elements.controleSomContainer.classList.contains('visible')) {
+                    this.elements.controleSomContainer.classList.remove('visible');
+                    this.elements.controleSomContainer.classList.add('hidden');
+                    this.elements.btnToggleControleSom.textContent = '🔊 Controle de Som';
+                } else {
+                    this.elements.controleSomContainer.classList.remove('hidden');
+                    this.elements.controleSomContainer.classList.add('visible');
+                    this.elements.btnToggleControleSom.textContent = '🔊 Controle de Som (Aberto)';
+                }
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !e.target.closest('input, button')) {
+                e.preventDefault();
+                this.coletarEnergia({ clientX: window.innerWidth/2, clientY: window.innerHeight/2 });
+            }
+            if (e.code === 'KeyP') {
+                e.preventDefault();
+                this.togglePausa();
+            }
+        });
+
+        this.atualizarVolume();
+        if (this.elements.ultimaMensagemErro) this.elements.ultimaMensagemErro.textContent = this.settings.ultimaMensagemErro;
+        this.renderizarConquistas();
+        this.carregarJogo();
+        this.atualizarExibicao();
+    }
 };
 
-// Inicializa o jogo quando o DOM estiver completamente carregado
-document.addEventListener('DOMContentLoaded', () => Game.init());
-
+// Inicializa o jogo quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', () => {
+    Game.init();
+});
