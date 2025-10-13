@@ -89,6 +89,223 @@ const Game = {
         ]
     },
 
+    // === SISTEMA DE ANIMAÇÕES E EFEITOS VISUAIS ===
+
+    // Inicializar sistema de partículas
+    inicializarSistemaParticulas() {
+        this.criarParticulasCosmicas(15);
+        this.iniciarAuroraEffect();
+        this.aplicarTexturaEraAtual();
+    },
+
+    // Criar partículas cósmicas de fundo
+    criarParticulasCosmicas(quantidade) {
+        for (let i = 0; i < quantidade; i++) {
+            setTimeout(() => {
+                this.criarParticulaCosmica();
+            }, i * 200);
+        }
+    },
+
+    criarParticulaCosmica() {
+        const particula = document.createElement('div');
+        const tipos = ['estrela', 'energia', 'poeira'];
+        const tipo = tipos[Math.floor(Math.random() * tipos.length)];
+        
+        particula.className = `particula-cosmica ${tipo}`;
+        
+        // Posição aleatória
+        const left = Math.random() * 100;
+        const top = Math.random() * 100;
+        const size = Math.random() * 3 + 1;
+        
+        particula.style.left = `${left}%`;
+        particula.style.top = `${top}%`;
+        particula.style.width = `${size}px`;
+        particula.style.height = `${size}px`;
+        
+        // Atraso de animação aleatório
+        particula.style.animationDelay = `${Math.random() * 5}s`;
+        
+        document.body.appendChild(particula);
+        
+        // Remover após um tempo e criar nova
+        setTimeout(() => {
+            if (particula.parentNode) {
+                particula.remove();
+                this.criarParticulaCosmica();
+            }
+        }, 15000 + Math.random() * 10000);
+    },
+
+    // Efeito Aurora
+    iniciarAuroraEffect() {
+        const aurora = document.createElement('div');
+        aurora.className = 'aurora-effect';
+        document.body.appendChild(aurora);
+    },
+
+    // Aplicar textura da era atual
+    aplicarTexturaEraAtual() {
+        const painelVisual = this.elements.painelVisual;
+        if (!painelVisual) return;
+        
+        // Remover textura anterior
+        const texturaAnterior = painelVisual.querySelector('.era-texture');
+        if (texturaAnterior) {
+            texturaAnterior.remove();
+        }
+        
+        // Adicionar classe da era atual
+        painelVisual.className = 'painel-visual';
+        painelVisual.classList.add(`era-${this.state.eraIndex}`);
+        
+        // Criar nova textura
+        const textura = document.createElement('div');
+        textura.className = 'era-texture';
+        painelVisual.appendChild(textura);
+    },
+
+    // Efeito de construção para upgrades
+    ativarEfeitoConstrucao(upgradeId) {
+        const painelVisual = this.elements.painelVisual;
+        if (!painelVisual) return;
+        
+        this.criarExplosaoParticulas(painelVisual);
+        this.criarOndaExpansao(painelVisual);
+        
+        // Feedback visual no upgrade card
+        const card = document.getElementById(`card-${upgradeId}`);
+        if (card) {
+            this.ativarEfeitoUpgrade(card);
+        }
+    },
+
+    criarExplosaoParticulas(container) {
+        const particleCount = 20;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particula = document.createElement('div');
+            particula.className = 'construcao-particulas';
+            
+            // Direção aleatória
+            const angle = (i / particleCount) * Math.PI * 2;
+            const distance = 0.5 + Math.random() * 0.5;
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            
+            particula.style.setProperty('--tx', tx);
+            particula.style.setProperty('--ty', ty);
+            
+            // Posição central
+            particula.style.left = '50%';
+            particula.style.top = '50%';
+            
+            // Atraso aleatório
+            particula.style.animationDelay = `${Math.random() * 0.5}s`;
+            
+            container.appendChild(particula);
+            
+            // Remover após animação
+            setTimeout(() => {
+                if (particula.parentNode) {
+                    particula.remove();
+                }
+            }, 2000);
+        }
+    },
+
+    criarOndaExpansao(container) {
+        const onda = document.createElement('div');
+        onda.className = 'onda-expansao';
+        onda.style.left = '50%';
+        onda.style.top = '50%';
+        onda.style.transform = 'translate(-50%, -50%)';
+        
+        container.appendChild(onda);
+        
+        // Remover após animação
+        setTimeout(() => {
+            if (onda.parentNode) {
+                onda.remove();
+            }
+        }, 1500);
+    },
+
+    // Efeito visual para upgrades
+    ativarEfeitoUpgrade(card) {
+        const efeito = document.createElement('div');
+        efeito.className = 'upgrade-efeito';
+        
+        const brilho = document.createElement('div');
+        brilho.className = 'upgrade-brilho';
+        efeito.appendChild(brilho);
+        
+        card.style.position = 'relative';
+        card.appendChild(efeito);
+        
+        // Remover após animação
+        setTimeout(() => {
+            if (efeito.parentNode) {
+                efeito.remove();
+            }
+        }, 2000);
+    },
+
+    // Efeito de clique melhorado
+    criarEfeitoClique(x, y) {
+        const efeito = document.createElement('div');
+        efeito.className = 'efeito-clique';
+        efeito.style.left = `${x}px`;
+        efeito.style.top = `${y}px`;
+        
+        document.body.appendChild(efeito);
+        
+        // Remover após animação
+        setTimeout(() => {
+            if (efeito.parentNode) {
+                efeito.remove();
+            }
+        }, 600);
+    },
+
+    // Partículas para renda automática
+    criarParticulasEnergia(quantidade) {
+        const particleCount = Math.min(Math.floor(quantidade / 10), 10);
+        
+        for (let i = 0; i < particleCount; i++) {
+            setTimeout(() => {
+                const particula = document.createElement('div');
+                particula.className = 'particula-renda';
+                particula.textContent = '⚡';
+                particula.style.left = `${Math.random() * 100}%`;
+                particula.style.top = `${100 + Math.random() * 20}%`;
+                particula.style.animationDelay = `${i * 0.1}s`;
+                
+                document.body.appendChild(particula);
+                
+                setTimeout(() => {
+                    if (particula.parentNode) {
+                        particula.remove();
+                    }
+                }, 3000);
+            }, i * 100);
+        }
+    },
+
+    // Celebrar nova era
+    celebrarNovaEra() {
+        // Efeitos especiais para nova era
+        this.criarExplosaoParticulas(this.elements.painelVisual);
+        
+        // Criar múltiplas ondas de expansão
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                this.criarOndaExpansao(this.elements.painelVisual);
+            }, i * 300);
+        }
+    },
+
     // 5. MÉTODOS DO JOGO
 
     // --- Funções de Utilidade ---
@@ -189,6 +406,10 @@ const Game = {
                 this.state.eraIndex = proximoIndex;
                 this.state.imagemAtual = novaEraObj.imagem.split('/').pop();
 
+                // Atualizar efeitos visuais da nova era
+                this.aplicarTexturaEraAtual();
+                this.celebrarNovaEra();
+                
                 this.aplicarTransicaoDeEra(novaEraObj);
                 this.anunciarNovaEra(antiga, novaEraObj.nome);
                 this.exibirNarrativa('era', proximoIndex);
@@ -439,14 +660,21 @@ const Game = {
     coletarEnergia(event) {
         if (this.settings.pausado) return;
 
+        // Criar efeito visual de clique
+        this.criarEfeitoClique(event.clientX, event.clientY);
+        
         this.state.cliques++;
         let energiaGanho = this.state.energiaPorClique * this.state.multiplicadorCliquesTotal * this.state.multiplicadorCliquesAtivo;
         if (this.settings.TEST_FAST_ERAS) energiaGanho *= this.settings.TEST_CLIQUES_POR_CLIQUE;
         this.state.energia += energiaGanho;
         this.tocarSom(this.data.SONS.click);
         this.exibirTextoFlutuante(energiaGanho, event);
-        this.elements.universoImg.classList.add('clique-impacto');
-        setTimeout(() => this.elements.universoImg.classList.remove('clique-impacto'), 100);
+        
+        if (this.elements.universoImg) {
+            this.elements.universoImg.classList.add('clique-impacto');
+            setTimeout(() => this.elements.universoImg.classList.remove('clique-impacto'), 100);
+        }
+        
         this.atualizarExibicao();
         this.tentarAvancarEra();
     },
@@ -455,537 +683,4 @@ const Game = {
         if (efeito.energiaPorClique) this.state.energiaPorClique += efeito.energiaPorClique;
         if (efeito.rendaAutomatica) this.state.rendaAutomatica += efeito.rendaAutomatica;
         if (efeito.multiplicadorCliquesTotal) this.state.multiplicadorCliquesTotal *= efeito.multiplicadorCliquesTotal;
-        if (efeito.multiplicadorRendaTotal) this.state.multiplicadorRendaTotal *= efeito.multiplicadorRendaTotal;
-        if (tocarSomUpgrade) this.tocarSom(this.data.SONS.upgrade);
-    },
-
-    comprarUpgrade(upgradeId) {
-        const upgrade = this.data.UPGRADES_CONFIG.find(u => u.id === upgradeId);
-        if (!upgrade) return;
-
-        const currentUpgradeState = this.state.upgradesComprados[upgrade.id] || { comprados: 0, custo: upgrade.baseCusto };
-        const custoAtual = currentUpgradeState.custo;
-
-        if (this.state.energia < custoAtual) {
-            // ANIMAÇÃO E SOM DE ERRO CORRIGIDOS
-            this.tocarSom(this.data.SONS.erro);
-            this.exibirMensagem('Energia insuficiente!', '#ff6347', true);
-            
-            const card = document.getElementById(`card-${upgrade.id}`);
-            if (card) {
-                card.classList.add('erro');
-                setTimeout(() => card.classList.remove('erro'), 1000);
-            }
-            
-            const button = document.getElementById(`btn-${upgrade.id}`);
-            if (button) {
-                button.classList.add('insuficiente');
-                setTimeout(() => {
-                    if (this.state.energia < custoAtual) {
-                        button.classList.add('insuficiente');
-                    }
-                }, 1000);
-            }
-            return;
-        }
-
-        // COMPRA BEM-SUCEDIDA
-        this.state.energia -= custoAtual;
-        
-        if (!this.state.upgradesComprados[upgrade.id]) {
-            this.state.upgradesComprados[upgrade.id] = { comprados: 0, custo: upgrade.baseCusto };
-        }
-        this.state.upgradesComprados[upgrade.id].comprados++;
-        
-        this.aplicarEfeito(upgrade.efeito);
-        
-        if (upgrade.multiplicavel) {
-            const novoCusto = Math.floor(upgrade.baseCusto * Math.pow(1.15, this.state.upgradesComprados[upgrade.id].comprados));
-            upgrade.custo = novoCusto;
-            this.state.upgradesComprados[upgrade.id].custo = novoCusto;
-        }
-
-        this.atualizarExibicao();
-        this.exibirNarrativa('upgrade', upgradeId);
-
-        const card = document.getElementById(`card-${upgrade.id}`);
-        if (card) {
-            card.classList.add('feedback-compra');
-            setTimeout(() => card.classList.remove('feedback-compra'), 1000);
-        }
-        
-        this.exibirTextoFlutuante('Upgrade Comprado!', { clientX: window.innerWidth/2, clientY: window.innerHeight/2 });
-    },
-
-    coletarRendaAutomatica() {
-        if (this.settings.pausado) return;
-        
-        let rendaTotal = this.state.rendaAutomatica * this.state.multiplicadorRendaTotal * this.state.multiplicadorRendaAtivo;
-        const energiaGanho = Math.round(rendaTotal);
-        this.state.energia += energiaGanho;
-        
-        this.coletarRendaAutomaticaVisual(energiaGanho);
-    },
-
-    coletarRendaAutomaticaVisual(energiaGanho) {
-        if (energiaGanho <= 0) return;
-        
-        const flutuante = document.createElement('span');
-        flutuante.textContent = `+${this.formatarNumero(energiaGanho)}`;
-        flutuante.className = 'flying-text auto-income-text';
-        
-        const painelStatus = this.elements.painelStatus || document.querySelector('.painel-status');
-        if (painelStatus) {
-            const rect = painelStatus.getBoundingClientRect();
-            flutuante.style.left = `${rect.left + rect.width / 2}px`;
-            flutuante.style.top = `${rect.top + 50}px`;
-        } else {
-            flutuante.style.left = `${window.innerWidth / 2}px`;
-            flutuante.style.top = `${window.innerHeight / 2}px`;
-        }
-
-        document.body.appendChild(flutuante);
-        setTimeout(() => flutuante.remove(), 1500);
-    },
-
-    aumentarTempo() {
-        if (this.settings.pausado) return;
-        this.state.tempoDecorrido++;
-        if (this.elements.timerSpan) this.elements.timerSpan.textContent = this.formatarTempo(this.state.tempoDecorrido);
-    },
-
-    // --- Navegação Rápida ---
-    rolarParaUpgrades() {
-        const upgradesContainer = this.elements.upgradesContainer;
-        if (upgradesContainer) upgradesContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    },
-
-    rolarParaStatus() {
-        const status = this.elements.painelStatus;
-        if (status) status.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    },
-
-    gerenciarBotoesDeRolagem() {
-        if (!this.elements.btnIrParaUpgrades || !this.elements.btnIrParaStatus) return;
-
-        const upgradesSection = this.elements.upgradesContainer;
-        if (!upgradesSection) return;
-
-        const upgradesY = upgradesSection.offsetTop;
-        const rolagemAtual = window.scrollY;
-
-        if (rolagemAtual > upgradesY - 200) {
-            if (this.elements.telaJogo && !this.elements.telaJogo.classList.contains('hidden')) {
-                this.elements.btnIrParaUpgrades.classList.add('hidden');
-                this.elements.btnIrParaStatus.classList.remove('hidden');
-            }
-        } else {
-            if (this.elements.telaJogo && !this.elements.telaJogo.classList.contains('hidden')) {
-                this.elements.btnIrParaUpgrades.classList.remove('hidden');
-                this.elements.btnIrParaStatus.classList.add('hidden');
-            }
-        }
-    },
-
-    // --- Exibição e UI ---
-    atualizarExibicao() {
-        if (!this.elements.dinheiroSpan) return;
-        this.elements.dinheiroSpan.textContent = this.formatarNumero(this.state.energia);
-        this.elements.dinheiroSpan.setAttribute('aria-label', `Energia atual: ${this.formatarNumero(this.state.energia)}`);
-
-        if (this.elements.contadorCliquesStatus) {
-            this.elements.contadorCliquesStatus.textContent = this.formatarNumero(this.state.cliques);
-        }
-
-        this.desabilitarUpgrades();
-        this.atualizarBarraProgresso();
-    },
-
-    carregarUpgrades() {
-        if (!this.elements.tabs.clique || this.elements.tabs.clique.children.length > 0) return;
-
-        this.data.UPGRADES_CONFIG.forEach(upgrade => {
-            if (!this.state.upgradesComprados[upgrade.id]) {
-                this.state.upgradesComprados[upgrade.id] = { comprados: 0, custo: upgrade.baseCusto };
-            }
-            const currentUpgradeState = this.state.upgradesComprados[upgrade.id];
-            const displayCusto = currentUpgradeState.custo;
-            const displayComprados = currentUpgradeState.comprados;
-
-            const upgradeCard = document.createElement('div');
-            upgradeCard.className = 'upgrade-card';
-            upgradeCard.id = `card-${upgrade.id}`;
-
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.id = `btn-${upgrade.id}`;
-            button.className = 'btn btn-upgrade btn-with-counter';
-            button.textContent = `Comprar`;
-            button.setAttribute('aria-label', `Comprar ${upgrade.nome} por ${this.formatarNumero(displayCusto)} energia`);
-
-            button.addEventListener('click', () => this.comprarUpgrade(upgrade.id));
-
-            const isMultiplicavel = upgrade.multiplicavel;
-            const contadorHtml = isMultiplicavel ? `<span class="upgrade-contador" id="contador-${upgrade.id}">x ${displayComprados}</span>` : '';
-            
-            upgradeCard.innerHTML = `
-                <h3>${upgrade.nome}</h3>
-                <p>${upgrade.descricao}</p>
-                <p class="custo-upgrade">Custo: ⚡ <span id="custo-display-${upgrade.id}">${this.formatarNumero(displayCusto)}</span></p>
-            `;
-            
-            const buttonWrapper = document.createElement('div');
-            buttonWrapper.className = 'upgrade-button-wrapper';
-            buttonWrapper.appendChild(button);
-            
-            if (isMultiplicavel) buttonWrapper.insertAdjacentHTML('beforeend', contadorHtml);
-
-            upgradeCard.appendChild(buttonWrapper);
-            const container = this.elements.tabs[upgrade.tipo];
-            if (container) container.appendChild(upgradeCard);
-        });
-    },
-
-    desabilitarUpgrades() {
-        this.data.UPGRADES_CONFIG.forEach(upgrade => {
-            const button = document.getElementById(`btn-${upgrade.id}`);
-            const custoTextoSpan = document.getElementById(`custo-display-${upgrade.id}`);
-            const contadorSpan = document.getElementById(`contador-${upgrade.id}`);
-            const card = document.getElementById(`card-${upgrade.id}`);
-            
-            if (!button) return;
-
-            const currentUpgradeState = this.state.upgradesComprados[upgrade.id] || { comprados: 0, custo: upgrade.baseCusto };
-            const custoAtual = currentUpgradeState.custo;
-            const compradosAtual = currentUpgradeState.comprados;
-
-            const jaComprado = !upgrade.multiplicavel && compradosAtual > 0;
-            const podeComprar = this.state.energia >= custoAtual;
-
-            if (upgrade.multiplicavel) {
-                button.disabled = false;
-                button.textContent = `Comprar`;
-                button.classList.remove('comprado');
-
-                if (!podeComprar) {
-                    button.classList.add('insuficiente');
-                    const falta = custoAtual - this.state.energia;
-                    button.textContent = `Falta ${this.formatarNumero(falta)}`;
-                } else {
-                    button.classList.remove('insuficiente');
-                }
-
-                if (custoTextoSpan) custoTextoSpan.textContent = this.formatarNumero(custoAtual);
-                if (contadorSpan) contadorSpan.textContent = `x ${compradosAtual}`;
-                if (card) card.classList.remove('comprado');
-            } else if (jaComprado) {
-                button.disabled = true;
-                button.classList.remove('insuficiente');
-                button.textContent = 'Comprado';
-                if (custoTextoSpan) custoTextoSpan.textContent = 'Permanente';
-                if (card) card.classList.add('comprado');
-            } else {
-                button.disabled = false;
-                button.textContent = `Comprar`;
-                
-                if (!podeComprar) {
-                    button.classList.add('insuficiente');
-                    const falta = custoAtual - this.state.energia;
-                    button.textContent = `Falta ${this.formatarNumero(falta)}`;
-                } else {
-                    button.classList.remove('insuficiente');
-                }
-                if (custoTextoSpan) custoTextoSpan.textContent = this.formatarNumero(custoAtual);
-                if (card) card.classList.remove('comprado');
-            }
-        });
-    },
-
-    mudarAba(idAba, botaoAtivo) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
-        const aba = document.getElementById(idAba);
-        if (aba) aba.classList.remove('hidden');
-
-        document.querySelectorAll('.tab-button').forEach(btn => {
-            btn.classList.remove('tab-active');
-            btn.setAttribute('aria-selected', 'false');
-            btn.tabIndex = -1;
-        });
-        if (botaoAtivo) {
-            botaoAtivo.classList.add('tab-active');
-            botaoAtivo.setAttribute('aria-selected', 'true');
-            botaoAtivo.tabIndex = 0;
-        }
-    },
-
-    exibirMensagem(texto, cor = '#ffcc66', isErro = false) {
-        if (!this.elements.mensagem) return;
-        
-        this.elements.mensagem.classList.remove('visivel', 'alerta');
-        this.elements.mensagem.textContent = texto;
-        this.elements.mensagem.style.color = cor;
-        this.elements.mensagem.classList.add('visivel');
-
-        if (isErro) {
-            this.elements.mensagem.classList.add('alerta');
-            this.settings.ultimaMensagemErro = texto;
-            if (this.elements.ultimaMensagemErro) this.elements.ultimaMensagemErro.textContent = texto;
-        }
-
-        setTimeout(() => this.elements.mensagem.classList.remove('visivel', 'alerta'), 2500);
-    },
-
-    exibirTextoFlutuante(texto, event) {
-        const flutuante = document.createElement('span');
-        flutuante.innerHTML = `⚡ +${this.formatarNumero(texto)}`;
-        flutuante.className = 'flying-text pulse';
-        flutuante.style.left = `${event.clientX}px`;
-        flutuante.style.top = `${event.clientY - 20}px`;
-
-        document.body.appendChild(flutuante);
-        setTimeout(() => flutuante.remove(), 1000);
-    },
-
-    togglePausa() {
-        this.settings.pausado = !this.settings.pausado;
-        if (this.settings.pausado) {
-            this.exibirMensagem("Jogo pausado.", '#ffcc66');
-            if (this.settings.somAtivo && this.settings.somFundoAtivo) this.data.SONS.fundo.pause();
-        } else {
-            this.exibirMensagem("Jogo retomado!", '#00ffcc');
-            if (this.settings.somAtivo && this.settings.somFundoAtivo) this.data.SONS.fundo.play();
-        }
-    },
-
-    reiniciarJogo() {
-        if (confirm('Tem certeza que deseja reiniciar o jogo? Todo o progresso será perdido!')) {
-            localStorage.removeItem('galaxiaClickerSave');
-            location.reload();
-        }
-    },
-
-    iniciarJogo() {
-        const nome = this.elements.nomeEmpresaInput.value.trim();
-        if (nome) this.state.nomeCivilizacao = nome;
-
-        this.elements.telaInicio.classList.add('hidden');
-        this.elements.telaJogo.classList.remove('hidden');
-        if (this.elements.tituloEmpresa) {
-            this.elements.tituloEmpresa.textContent = `🚀 ${this.state.nomeCivilizacao} - Era ${this.data.ERAS[this.state.eraIndex].nome}`;
-        }
-
-        this.inicializarSons();
-        if (this.settings.somAtivo && this.settings.somFundoAtivo) this.data.SONS.fundo.play();
-
-        this.carregarUpgrades();
-        this.desabilitarUpgrades();
-        this.generarEstrelas();
-        this.iniciarEventosAleatorios();
-        requestAnimationFrame(this.updateLoop.bind(this));
-        this.carregarJogo();
-        this.renderizarConquistas();
-        this.atualizarExibicao();
-    },
-
-    // --- Persistência de Dados ---
-    salvarJogo() {
-        try {
-            const saveState = {
-                state: this.state,
-                upgradesConfigState: this.data.UPGRADES_CONFIG.map(u => ({ 
-                    id: u.id, 
-                    comprados: (this.state.upgradesComprados[u.id] ? this.state.upgradesComprados[u.id].comprados : 0), 
-                    custo: (this.state.upgradesComprados[u.id] ? this.state.upgradesComprados[u.id].custo : u.baseCusto) 
-                }))
-            };
-            localStorage.setItem('galaxiaClickerSave', JSON.stringify(saveState));
-            this.elements.mensagemSalvar.classList.remove('hidden');
-            setTimeout(() => this.elements.mensagemSalvar.classList.add('hidden'), 2000);
-            this.tocarSom(this.data.SONS.salvar);
-        } catch (e) {
-            console.error("Erro ao salvar o jogo:", e);
-            this.exibirMensagem("Erro ao salvar o jogo!", '#ff6347', true);
-        }
-    },
-
-    carregarJogo() {
-        try {
-            const savedGame = localStorage.getItem('galaxiaClickerSave');
-            if (savedGame) {
-                const loadedData = JSON.parse(savedGame);
-                this.state = { ...this.state, ...loadedData.state };
-
-                loadedData.upgradesConfigState.forEach(savedUpgrade => {
-                    const originalUpgrade = this.data.UPGRADES_CONFIG.find(u => u.id === savedUpgrade.id);
-                    if (originalUpgrade) {
-                        originalUpgrade.comprados = savedUpgrade.comprados;
-                        originalUpgrade.custo = savedUpgrade.custo;
-                        this.state.upgradesComprados[savedUpgrade.id] = { comprados: savedUpgrade.comprados, custo: savedUpgrade.custo };
-                    }
-                });
-
-                if (this.state.nomeCivilizacao !== "Galáxia Clicker" && this.elements.nomeEmpresaInput) {
-                    this.elements.nomeEmpresaInput.value = this.state.nomeCivilizacao;
-                }
-                this.elements.eraAtual.textContent = this.data.ERAS[this.state.eraIndex].nome;
-                this.elements.universoImg.src = this.data.ERAS[this.state.eraIndex].imagem;
-                this.elements.tituloEmpresa.textContent = `🚀 ${this.state.nomeCivilizacao} - Era ${this.data.ERAS[this.state.eraIndex].nome}`;
-                this.atualizarVolume();
-                this.renderizarConquistas();
-            }
-        } catch (e) {
-            console.error("Erro ao carregar o jogo:", e);
-            this.exibirMensagem("Erro ao carregar o jogo!", '#ff6347', true);
-        }
-    },
-
-    // --- Inicialização CORRIGIDA ---
-    init() {
-        // Pré-carrega imagens das eras
-        this.data.ERAS.forEach(e => {
-            const img = new Image();
-            img.src = e.imagem;
-        });
-
-        // Inicializa o estado de 'comprados' e 'baseCusto' para upgrades
-        this.data.UPGRADES_CONFIG.forEach(u => {
-            u.comprados = 0;
-            if (!u.baseCusto) u.baseCusto = u.custo;
-        });
-
-        // Mapeia os elementos do DOM - CORRIGIDO para incluir conquistas
-        this.elements = {
-            telaInicio: document.getElementById('telaInicio'),
-            telaJogo: document.getElementById('jogo'),
-            nomeEmpresaInput: document.getElementById('nomeEmpresa'),
-            tituloEmpresa: document.getElementById('tituloEmpresa'),
-            dinheiroSpan: document.getElementById('dinheiro'),
-            contadorCliquesStatus: document.getElementById('move-counter-status'),
-            timerSpan: document.getElementById('timer'),
-            barraExpansao: document.getElementById('barraExpansao'),
-            progressoTexto: document.getElementById('progresso-texto'),
-            mensagem: document.getElementById('mensagem'),
-            universoImg: document.getElementById('universo-img'),
-            eraAtual: document.getElementById('era-atual'),
-            tabs: {
-                clique: document.getElementById('clique-tab'),
-                automatica: document.getElementById('automatica-tab'),
-                expansao: document.getElementById('expansao-tab')
-            },
-            mensagemSalvar: document.getElementById('mensagem-salvar'),
-            iniciarJogoBtn: document.getElementById('iniciar-jogo-btn'),
-            btnSalvar: document.getElementById('btnSalvar'),
-            btnReiniciar: document.getElementById('btnReiniciar'),
-            btnToggleSomGeral: document.getElementById('btnToggleSomGeral'),
-            btnToggleSomFundo: document.getElementById('btnToggleSomFundo'),
-            volumeMaster: document.getElementById('volumeMaster'),
-            volumeValor: document.getElementById('volumeValor'),
-            ultimaMensagemErro: document.getElementById('ultimaMensagemErro'),
-            btnIrParaUpgrades: document.getElementById('btnIrParaUpgrades'),
-            btnIrParaStatus: document.getElementById('btnIrParaStatus'),
-            btnToggleControleSom: document.getElementById('btnToggleControleSom'),
-            controleSomContainer: document.getElementById('controle-som-container'),
-            btnToggleConquistas: document.getElementById('btnToggleConquistas'),
-            conquistasContainer: document.getElementById('conquistas-container'),
-            conquistasContainerGame: document.getElementById('conquistas-container-game'),
-            achievementNotification: document.getElementById('achievement-notification'),
-            painelStatus: document.querySelector('.painel-status'),
-            upgradesContainer: document.getElementById('upgrades-container')
-        };
-
-        // CORREÇÃO: Cria botão de conquistas no jogo se não existir
-        if (!document.getElementById('btnToggleConquistasGame')) {
-            const btnConquistasGame = document.createElement('button');
-            btnConquistasGame.id = 'btnToggleConquistasGame';
-            btnConquistasGame.className = 'btn btn-toggle-conquistas';
-            btnConquistasGame.textContent = 'Ver Conquistas';
-            
-            const conquistasContainerGame = this.elements.conquistasContainerGame;
-            if (conquistasContainerGame && conquistasContainerGame.parentNode) {
-                conquistasContainerGame.parentNode.insertBefore(btnConquistasGame, conquistasContainerGame);
-                this.elements.btnToggleConquistasGame = btnConquistasGame;
-            }
-        } else {
-            this.elements.btnToggleConquistasGame = document.getElementById('btnToggleConquistasGame');
-        }
-
-        // Verifica URL params para modo de teste
-        const urlParams = new URLSearchParams(window.location.search);
-        this.settings.TEST_FAST_ERAS = urlParams.get('test') === 'true';
-
-        // Adiciona os event listeners - CORRIGIDO para conquistas
-        if (this.elements.iniciarJogoBtn) this.elements.iniciarJogoBtn.addEventListener('click', this.iniciarJogo.bind(this));
-        if (this.elements.btnSalvar) this.elements.btnSalvar.addEventListener('click', this.salvarJogo.bind(this));
-        if (this.elements.btnReiniciar) this.elements.btnReiniciar.addEventListener('click', this.reiniciarJogo.bind(this));
-        if (this.elements.btnToggleSomGeral) this.elements.btnToggleSomGeral.addEventListener('click', this.toggleSomGeral.bind(this));
-        if (this.elements.btnToggleSomFundo) this.elements.btnToggleSomFundo.addEventListener('click', this.toggleSomFundo.bind(this));
-        if (this.elements.volumeMaster) this.elements.volumeMaster.addEventListener('input', this.atualizarVolume.bind(this));
-        if (this.elements.btnIrParaUpgrades) this.elements.btnIrParaUpgrades.addEventListener('click', this.rolarParaUpgrades.bind(this));
-        if (this.elements.btnIrParaStatus) this.elements.btnIrParaStatus.addEventListener('click', this.rolarParaStatus.bind(this));
-        window.addEventListener('scroll', this.gerenciarBotoesDeRolagem.bind(this));
-        
-        // Event listeners para conquistas - CORRIGIDO
-        if (this.elements.btnToggleConquistas) {
-            this.elements.btnToggleConquistas.addEventListener('click', this.toggleConquistasInicio.bind(this));
-        }
-        if (this.elements.btnToggleConquistasGame) {
-            this.elements.btnToggleConquistasGame.addEventListener('click', this.toggleConquistasGame.bind(this));
-        }
-        
-        if (this.elements.telaJogo) {
-            this.elements.telaJogo.addEventListener('click', (event) => {
-                if (!event.target.closest('.btn') && !event.target.closest('.upgrade-card')) {
-                    this.coletarEnergia(event);
-                }
-            });
-        }
-
-        if (this.elements.universoImg) {
-            this.elements.universoImg.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.coletarEnergia(e);
-            });
-        }
-
-        document.getElementById('tab-btn-clique')?.addEventListener('click', (e) => this.mudarAba('clique-tab', e.target));
-        document.getElementById('tab-btn-automatica')?.addEventListener('click', (e) => this.mudarAba('automatica-tab', e.target));
-        document.getElementById('tab-btn-expansao')?.addEventListener('click', (e) => this.mudarAba('expansao-tab', e.target));
-        this.mudarAba('clique-tab', document.getElementById('tab-btn-clique'));
-
-        if (this.elements.btnToggleControleSom) {
-            this.elements.btnToggleControleSom.addEventListener('click', () => {
-                if (this.elements.controleSomContainer.classList.contains('visible')) {
-                    this.elements.controleSomContainer.classList.remove('visible');
-                    this.elements.controleSomContainer.classList.add('hidden');
-                    this.elements.btnToggleControleSom.textContent = '🔊 Controle de Som';
-                } else {
-                    this.elements.controleSomContainer.classList.remove('hidden');
-                    this.elements.controleSomContainer.classList.add('visible');
-                    this.elements.btnToggleControleSom.textContent = '🔊 Controle de Som (Aberto)';
-                }
-            });
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' && !e.target.closest('input, button')) {
-                e.preventDefault();
-                this.coletarEnergia({ clientX: window.innerWidth/2, clientY: window.innerHeight/2 });
-            }
-            if (e.code === 'KeyP') {
-                e.preventDefault();
-                this.togglePausa();
-            }
-        });
-
-        this.atualizarVolume();
-        if (this.elements.ultimaMensagemErro) this.elements.ultimaMensagemErro.textContent = this.settings.ultimaMensagemErro;
-        this.renderizarConquistas();
-        this.carregarJogo();
-        this.atualizarExibicao();
-    }
-};
-
-// Inicializa o jogo quando o DOM estiver carregado
-document.addEventListener('DOMContentLoaded', () => {
-    Game.init();
-});
+        if (efeito.multiplic
