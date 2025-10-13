@@ -157,9 +157,9 @@ h2 {
 
 .game-main {
     display: flex;
-    flex-direction: column; /* Para que fiquem um acima do outro */
+    flex-direction: column;
     align-items: center;
-    gap: 20px; /* Espaçamento entre o painel de status e o visual */
+    gap: 20px;
     margin-top: 20px;
 }
 
@@ -189,8 +189,8 @@ h2 {
     display: flex; 
     justify-content: center;
     align-items: center;
-    border-radius: 50%; /* Para dar um formato de planeta */
-    overflow: hidden; /* Garante que a imagem não saia do círculo */
+    border-radius: 50%;
+    overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 153, 255, 0.5);
 }
 
@@ -209,24 +209,6 @@ h2 {
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 0.9em;
-}
-
-#conquistas-container-game {
-    background: var(--cor-fundo-card);
-    border-radius: 12px;
-    padding: 15px;
-    margin: 20px auto;
-    width: clamp(280px, 90vw, 400px);
-    box-shadow: 0 0 12px rgba(100, 100, 255, 0.2);
-    backdrop-filter: blur(4px);
-    text-align: left;
-}
-
-#conquistas-lista-game {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 10px;
-    margin-top: 10px;
 }
 
 .painel-status:hover {
@@ -625,12 +607,14 @@ input[type="range"] {
     transform: translateY(0);
 }
 
-#conquistas-container, #conquistas-container-game {
+/* === CONQUISTAS - ESTILOS CORRIGIDOS === */
+#conquistas-container, 
+#conquistas-container-game {
     background: var(--cor-fundo-card);
     border-radius: 12px;
     padding: 15px;
     margin: 20px auto;
-    width: clamp(280px, 90vw, 350px);
+    width: clamp(280px, 90vw, 400px);
     box-shadow: 0 0 12px rgba(100, 100, 255, 0.2);
     backdrop-filter: blur(4px);
     text-align: left;
@@ -638,10 +622,11 @@ input[type="range"] {
     overflow-y: auto;
     opacity: 1;
     transform: translateY(0);
-    transition: opacity 0.5s ease, transform 0.5s ease, max-height 0.5s ease, padding 0.5s ease, margin 0.5s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-#conquistas-container.hidden, #conquistas-container-game.hidden {
+#conquistas-container.hidden, 
+#conquistas-container-game.hidden {
     opacity: 0;
     transform: translateY(20px);
     pointer-events: none;
@@ -650,6 +635,159 @@ input[type="range"] {
     margin: 0 auto;
     border: none;
     box-shadow: none;
+    overflow: hidden;
+}
+
+/* Container específico para conquistas no jogo */
+#conquistas-container-game {
+    position: relative;
+    margin-top: 30px;
+}
+
+#conquistas-container-game h2 {
+    text-align: center;
+    color: var(--cor-titulo);
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--cor-detalhe);
+    padding-bottom: 8px;
+}
+
+/* Estilo para lista de conquistas */
+#conquistas-lista,
+#conquistas-lista-game {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Cards de conquista individuais */
+.conquista-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--cor-detalhe);
+    border-radius: 8px;
+    padding: 12px;
+    transition: all 0.3s ease;
+}
+
+.conquista-card.comprado {
+    border-color: var(--cor-sucesso);
+    background: rgba(76, 175, 80, 0.1);
+    animation: glow-success 2s ease-in-out;
+}
+
+.conquista-card h3 {
+    color: var(--cor-titulo);
+    margin: 0 0 5px 0;
+    font-size: 1em;
+}
+
+.conquista-card p {
+    margin: 2px 0;
+    font-size: 0.9em;
+}
+
+.conquista-card .status {
+    font-weight: bold;
+    margin-top: 5px;
+    font-size: 0.85em;
+}
+
+.conquista-card.comprado .status {
+    color: var(--cor-sucesso);
+}
+
+.conquista-card:not(.comprado) .status {
+    color: var(--cor-erro);
+    opacity: 0.7;
+}
+
+/* Notificação de conquista */
+.notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(45deg, var(--cor-sucesso), #2E8B57);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    z-index: 3000;
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.8);
+    animation: notification-pop 0.5s ease-out;
+}
+
+@keyframes notification-pop {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    70% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* Botão de toggle para conquistas */
+.btn-toggle-conquistas {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #000;
+    border: none;
+    margin: 10px auto;
+    display: block;
+}
+
+.btn-toggle-conquistas:hover {
+    background: linear-gradient(45deg, #FFA500, #FF8C00);
+    box-shadow: 0 0 15px #FFD700;
+}
+
+#controle-som-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+}
+
+#controle-som-container.visible {
+    max-height: 300px;
+    opacity: 1;
+}
+
+.btn-toggle-som {
+    background: linear-gradient(45deg, #0099ff, #00ffcc);
+}
+
+.btn-toggle-som:hover {
+    box-shadow: 0 0 15px #00ffcc;
+}
+
+.game-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.btn-upgrade.insuficiente {
+    opacity: 0.85;
+    border-color: var(--cor-erro);
+    background: rgba(255, 99, 71, 0.3);
+    cursor: pointer;
+    position: relative;
+}
+
+.btn-upgrade.insuficiente::after {
+    content: '⚠️';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8em;
+}
+
+.btn-upgrade.insuficiente:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px var(--cor-erro), 0 0 20px rgba(255, 99, 71, 0.5);
 }
 
 @media (max-width: 500px) {
@@ -699,6 +837,13 @@ input[type="range"] {
         width: 90vw;
         max-width: 300px;
     }
+    .conquista-card {
+        padding: 8px;
+    }
+    .notification {
+        font-size: 1em;
+        padding: 15px 20px;
+    }
 }
 
 @media (min-width: 501px) and (max-width: 768px) {
@@ -706,57 +851,3 @@ input[type="range"] {
     .upgrade-card { width: 45%; display: inline-block; margin: 1%; }
     .painel-navegacao-rapida { width: 60%; }
 }
-
-.btn-upgrade.insuficiente {
-    opacity: 0.85;
-    border-color: var(--cor-erro);
-    background: rgba(255, 99, 71, 0.3);
-    cursor: pointer;
-    position: relative;
-}
-
-.btn-upgrade.insuficiente::after {
-    content: '⚠️';
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.8em;
-}
-
-.btn-upgrade.insuficiente:hover {
-    opacity: 1;
-    transform: translateY(-2px);
-    box-shadow: 0 0 10px var(--cor-erro), 0 0 20px rgba(255, 99, 71, 0.5);
-}
-
-#controle-som-container {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-    opacity: 0;
-}
-
-#controle-som-container.visible {
-    max-height: 300px;
-    opacity: 1;
-}
-
-.btn-toggle-som {
-    background: linear-gradient(45deg, #0099ff, #00ffcc);
-}
-
-.btn-toggle-som:hover {
-    box-shadow: 0 0 15px #00ffcc;
-}
-
-.game-main {
-    display: flex;
-    flex-direction: column; /* Altera para coluna para empilhar os painéis */
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-
