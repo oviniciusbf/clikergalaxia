@@ -31,6 +31,11 @@
                 <input type="range" id="volumeMaster" min="0" max="100" value="50">
                 <p id="ultimaMensagemErro">Nenhum erro recente.</p>
             </div>
+            <div id="conquistas-container-game" class="hidden">
+                <h2>Conquistas</h2>
+                <div id="conquistas-lista-game"></div>
+                <button id="btnToggleConquistasGame" class="btn btn-toggle-conquistas">Esconder Conquistas</button>
+            </div>
             <div id="mensagem-salvar" class="hidden">Jogo Salvo!</div>
         </div>
 
@@ -71,12 +76,6 @@
             <div id="clique-tab" class="tab-content"></div>
             <div id="automatica-tab" class="tab-content hidden"></div>
             <div id="expansao-tab" class="tab-content hidden"></div>
-        </div>
-
-        <!-- Container de conquistas agora visível em jogo também -->
-        <div id="conquistas-container-game" class="hidden">
-            <h2>Conquistas</h2>
-            <div id="conquistas-lista-game"></div>
         </div>
 
         <!-- Notificação de conquista adicionada -->
