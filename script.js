@@ -1,4 +1,3 @@
-
 const Game = {
     // 1. ESTADO CENTRALIZADO
     state: {
@@ -27,8 +26,8 @@ const Game = {
         ultimoUpdate: 0,
         ultimaMensagemErro: "Nenhum erro recente.",
         eventoAtual: null,
-        TEST_FAST_ERAS: false, // Inicializado como false, pode ser alterado por URL params
-        TEST_CLIQUES_POR_CLIQUE: 10 // Inicializado como 10, pode ser alterado por URL params
+        TEST_FAST_ERAS: false,
+        TEST_CLIQUES_POR_CLIQUE: 10
     },
 
     // 3. ELEMENTOS DOM (serão preenchidos em init)
@@ -258,15 +257,13 @@ const Game = {
         }
     },
 
-    // --- Sistema de Conquistas ---
+    // --- Sistema de Conquistas CORRIGIDO ---
     verificarConquistas() {
         this.data.CONQUISTAS.forEach(c => {
             if (!this.state.conquistasDesbloqueadas.includes(c.id) && c.condicao()) {
                 this.state.conquistasDesbloqueadas.push(c.id);
                 this.mostrarNotificacaoConquista(c.nome);
-                if (this.elements.mensagem) {
-                    this.exibirMensagem(`🏆 Nova Conquista: ${c.nome}!`, '#ffcc00');
-                }
+                this.exibirMensagem(`🏆 Nova Conquista: ${c.nome}!`, '#ffcc00');
                 this.tocarSom(this.data.SONS.conquista);
                 this.renderizarConquistas();
             }
@@ -278,38 +275,70 @@ const Game = {
         if (notificacao) {
             notificacao.textContent = `🏆 Conquista Desbloqueada: ${nome}!`;
             notificacao.classList.remove('hidden');
-            setTimeout(() => notificacao.classList.add('hidden'), 3000);
+            setTimeout(() => {
+                notificacao.classList.add('hidden');
+            }, 3000);
         }
     },
 
     renderizarConquistas() {
-        const container = this.elements.conquistasContainer;
-        if (!container) return;
-        container.innerHTML = '';
-        this.data.CONQUISTAS.forEach(c => {
-            const isDesbloqueada = this.state.conquistasDesbloqueadas.includes(c.id);
-            const card = document.createElement('div');
-            card.className = 'upgrade-card';
-            card.innerHTML = `
-                <h3>${c.nome}</h3>
-                <p>${c.descricao}</p>
-                <p>${isDesbloqueada ? 'Desbloqueada!' : 'Bloqueada'}</p>
-            `;
-            if (isDesbloqueada) card.classList.add('comprado');
-            container.appendChild(card);
+        // Renderiza conquistas na tela inicial
+        const containerInicio = this.elements.conquistasContainer;
+        // Renderiza conquistas no jogo
+        const containerGame = this.elements.conquistasContainerGame;
+        
+        [containerInicio, containerGame].forEach(container => {
+            if (!container) return;
+            
+            // Limpa o container
+            const lista = container.querySelector('#conquistas-lista, #conquistas-lista-game');
+            if (lista) {
+                lista.innerHTML = '';
+                
+                this.data.CONQUISTAS.forEach(c => {
+                    const isDesbloqueada = this.state.conquistasDesbloqueadas.includes(c.id);
+                    const card = document.createElement('div');
+                    card.className = `conquista-card ${isDesbloqueada ? 'comprado' : ''}`;
+                    card.innerHTML = `
+                        <h3>${c.nome}</h3>
+                        <p>${c.descricao}</p>
+                        <p class="status">${isDesbloqueada ? '🏆 Desbloqueada!' : '🔒 Bloqueada'}</p>
+                    `;
+                    lista.appendChild(card);
+                });
+            }
         });
     },
 
     toggleConquistas() {
-        const container = this.elements.conquistasContainer;
-        const btn = this.elements.btnToggleConquistas;
-        if (!container || !btn) return;
-        if (container.classList.contains('hidden')) {
-            container.classList.remove('hidden');
-            btn.textContent = 'Esconder Conquistas';
-        } else {
-            container.classList.add('hidden');
-            btn.textContent = 'Ver Conquistas';
+        // Toggle para conquistas na tela inicial
+        const containerInicio = this.elements.conquistasContainer;
+        const btnInicio = this.elements.btnToggleConquistas;
+        
+        // Toggle para conquistas no jogo
+        const containerGame = this.elements.conquistasContainerGame;
+        const btnGame = this.elements.btnToggleConquistasGame;
+
+        // Toggle container de início
+        if (containerInicio && btnInicio) {
+            if (containerInicio.classList.contains('hidden')) {
+                containerInicio.classList.remove('hidden');
+                btnInicio.textContent = 'Esconder Conquistas';
+            } else {
+                containerInicio.classList.add('hidden');
+                btnInicio.textContent = 'Ver Conquistas';
+            }
+        }
+
+        // Toggle container do jogo
+        if (containerGame && btnGame) {
+            if (containerGame.classList.contains('hidden')) {
+                containerGame.classList.remove('hidden');
+                btnGame.textContent = 'Esconder Conquistas';
+            } else {
+                containerGame.classList.add('hidden');
+                btnGame.textContent = 'Ver Conquistas';
+            }
         }
     },
 
@@ -319,7 +348,7 @@ const Game = {
             this.coletarRendaAutomatica();
             this.aumentarTempo();
             this.atualizarExibicao();
-            this.verificarConquistas();
+            this.verificarConquistas(); // Agora funciona corretamente
             this.settings.ultimoUpdate = timestamp;
         }
         requestAnimationFrame(this.updateLoop.bind(this));
@@ -353,7 +382,7 @@ const Game = {
         this.settings.eventoAtual = eventoEscolhido;
         this.exibirMensagem(eventoEscolhido.mensagem, '#00ffcc');
         this.exibirNarrativa('evento', eventoEscolhido.nome);
-        this.tocarSom(this.data.SONS.cometa); // Exemplo de som para evento
+        this.tocarSom(this.data.SONS.cometa);
 
         switch (eventoEscolhido.efeito.tipo) {
             case 'multiplicador_clique':
@@ -403,7 +432,7 @@ const Game = {
 
         this.state.cliques++;
         let energiaGanho = this.state.energiaPorClique * this.state.multiplicadorCliquesTotal * this.state.multiplicadorCliquesAtivo;
-        if (this.settings.TEST_FAST_ERAS) energiaGanho *= this.settings.TEST_CLIQUES_POR_CLIQUE; // Modo de teste
+        if (this.settings.TEST_FAST_ERAS) energiaGanho *= this.settings.TEST_CLIQUES_POR_CLIQUE;
         this.state.energia += energiaGanho;
         this.tocarSom(this.data.SONS.click);
         this.exibirTextoFlutuante(energiaGanho, event);
@@ -430,7 +459,6 @@ const Game = {
         }
 
         this.state.energia -= upgrade.custo;
-        // Atualiza o estado do upgrade no gameState.upgradesComprados
         if (!this.state.upgradesComprados[upgrade.id]) {
             this.state.upgradesComprados[upgrade.id] = { comprados: 0, custo: upgrade.baseCusto };
         }
@@ -438,9 +466,8 @@ const Game = {
         
         this.aplicarEfeito(upgrade.efeito);
         if (upgrade.multiplicavel) {
-            // Atualiza o custo no objeto de configuração para renderização
             upgrade.custo = Math.floor(upgrade.baseCusto * Math.pow(1.15, this.state.upgradesComprados[upgrade.id].comprados));
-            this.state.upgradesComprados[upgrade.id].custo = upgrade.custo; // Armazena o custo atual no estado
+            this.state.upgradesComprados[upgrade.id].custo = upgrade.custo;
         }
 
         this.atualizarExibicao();
@@ -542,11 +569,9 @@ const Game = {
         if (!this.elements.tabs.clique || this.elements.tabs.clique.children.length > 0) return;
 
         this.data.UPGRADES_CONFIG.forEach(upgrade => {
-            // Garante que o estado do upgrade seja inicializado se não existir
             if (!this.state.upgradesComprados[upgrade.id]) {
                 this.state.upgradesComprados[upgrade.id] = { comprados: 0, custo: upgrade.baseCusto };
             }
-            // Usa o custo e comprados do estado, mas o resto da config do data
             const currentUpgradeState = this.state.upgradesComprados[upgrade.id];
             const displayCusto = currentUpgradeState.custo;
             const displayComprados = currentUpgradeState.comprados;
@@ -721,18 +746,21 @@ const Game = {
         this.generarEstrelas();
         this.iniciarEventosAleatorios();
         requestAnimationFrame(this.updateLoop.bind(this));
-        this.carregarJogo(); // Carrega o jogo novamente para garantir que o estado seja consistente após iniciar
+        this.carregarJogo();
         this.renderizarConquistas();
-        this.atualizarExibicao(); // Garante que a UI reflita o estado carregado
+        this.atualizarExibicao();
     },
 
     // --- Persistência de Dados ---
     salvarJogo() {
         try {
-            // Salva apenas o estado e os upgrades comprados (que já contêm o custo atualizado)
             const saveState = {
                 state: this.state,
-                upgradesConfigState: this.data.UPGRADES_CONFIG.map(u => ({ id: u.id, comprados: (this.state.upgradesComprados[u.id] ? this.state.upgradesComprados[u.id].comprados : 0), custo: (this.state.upgradesComprados[u.id] ? this.state.upgradesComprados[u.id].custo : u.baseCusto) }))
+                upgradesConfigState: this.data.UPGRADES_CONFIG.map(u => ({ 
+                    id: u.id, 
+                    comprados: (this.state.upgradesComprados[u.id] ? this.state.upgradesComprados[u.id].comprados : 0), 
+                    custo: (this.state.upgradesComprados[u.id] ? this.state.upgradesComprados[u.id].custo : u.baseCusto) 
+                }))
             };
             localStorage.setItem('galaxiaClickerSave', JSON.stringify(saveState));
             this.elements.mensagemSalvar.classList.remove('hidden');
@@ -749,10 +777,8 @@ const Game = {
             const savedGame = localStorage.getItem('galaxiaClickerSave');
             if (savedGame) {
                 const loadedData = JSON.parse(savedGame);
-                // Mescla o estado salvo com o estado inicial para garantir compatibilidade com novas propriedades
                 this.state = { ...this.state, ...loadedData.state };
 
-                // Restaura o estado dos upgrades, incluindo o custo atualizado
                 loadedData.upgradesConfigState.forEach(savedUpgrade => {
                     const originalUpgrade = this.data.UPGRADES_CONFIG.find(u => u.id === savedUpgrade.id);
                     if (originalUpgrade) {
@@ -762,16 +788,14 @@ const Game = {
                     }
                 });
 
-                // Atualiza o nome da civilização no input se já estiver definido
                 if (this.state.nomeCivilizacao !== "Galáxia Clicker" && this.elements.nomeEmpresaInput) {
                     this.elements.nomeEmpresaInput.value = this.state.nomeCivilizacao;
                 }
-                // Atualiza o nome da era
                 this.elements.eraAtual.textContent = this.data.ERAS[this.state.eraIndex].nome;
                 this.elements.universoImg.src = this.data.ERAS[this.state.eraIndex].imagem;
                 this.elements.tituloEmpresa.textContent = `🚀 ${this.state.nomeCivilizacao} - Era ${this.data.ERAS[this.state.eraIndex].nome}`;
-                this.atualizarVolume(); // Garante que o volume salvo seja aplicado
-                this.renderizarConquistas(); // Renderiza conquistas com base no estado carregado
+                this.atualizarVolume();
+                this.renderizarConquistas();
             }
         } catch (e) {
             console.error("Erro ao carregar o jogo:", e);
@@ -779,7 +803,7 @@ const Game = {
         }
     },
 
-    // --- Inicialização ---
+    // --- Inicialização CORRIGIDA ---
     init() {
         // Pré-carrega imagens das eras
         this.data.ERAS.forEach(e => {
@@ -793,7 +817,7 @@ const Game = {
             if (!u.baseCusto) u.baseCusto = u.custo;
         });
 
-        // Mapeia os elementos do DOM
+        // Mapeia os elementos do DOM - CORRIGIDO para incluir conquistas
         this.elements = {
             telaInicio: document.getElementById('telaInicio'),
             telaJogo: document.getElementById('jogo'),
@@ -826,15 +850,19 @@ const Game = {
             btnToggleControleSom: document.getElementById('btnToggleControleSom'),
             controleSomContainer: document.getElementById('controle-som-container'),
             btnToggleConquistas: document.getElementById('btnToggleConquistas'),
+            btnToggleConquistasGame: document.getElementById('btnToggleConquistasGame'),
+            conquistasContainer: document.getElementById('conquistas-container'),
+            conquistasContainerGame: document.getElementById('conquistas-container-game'),
             achievementNotification: document.getElementById('achievement-notification'),
-            painelStatus: document.querySelector('.painel-status') // Adicionado para referência
+            painelStatus: document.querySelector('.painel-status'),
+            upgradesContainer: document.getElementById('upgrades-container')
         };
 
         // Verifica URL params para modo de teste
         const urlParams = new URLSearchParams(window.location.search);
         this.settings.TEST_FAST_ERAS = urlParams.get('test') === 'true';
 
-        // Adiciona os event listeners
+        // Adiciona os event listeners - CORRIGIDO para conquistas
         if (this.elements.iniciarJogoBtn) this.elements.iniciarJogoBtn.addEventListener('click', this.iniciarJogo.bind(this));
         if (this.elements.btnSalvar) this.elements.btnSalvar.addEventListener('click', this.salvarJogo.bind(this));
         if (this.elements.btnReiniciar) this.elements.btnReiniciar.addEventListener('click', this.reiniciarJogo.bind(this));
@@ -844,6 +872,28 @@ const Game = {
         if (this.elements.btnIrParaUpgrades) this.elements.btnIrParaUpgrades.addEventListener('click', this.rolarParaUpgrades.bind(this));
         if (this.elements.btnIrParaStatus) this.elements.btnIrParaStatus.addEventListener('click', this.rolarParaStatus.bind(this));
         window.addEventListener('scroll', this.gerenciarBotoesDeRolagem.bind(this));
+        
+        // CORREÇÃO: Adiciona botão de conquistas no jogo
+        if (!document.getElementById('btnToggleConquistasGame')) {
+            const btnConquistasGame = document.createElement('button');
+            btnConquistasGame.id = 'btnToggleConquistasGame';
+            btnConquistasGame.className = 'btn btn-toggle-conquistas';
+            btnConquistasGame.textContent = 'Ver Conquistas';
+            
+            const conquistasContainerGame = this.elements.conquistasContainerGame;
+            if (conquistasContainerGame && conquistasContainerGame.parentNode) {
+                conquistasContainerGame.parentNode.insertBefore(btnConquistasGame, conquistasContainerGame);
+                this.elements.btnToggleConquistasGame = btnConquistasGame;
+            }
+        }
+
+        // Event listeners para conquistas - CORRIGIDO
+        if (this.elements.btnToggleConquistas) {
+            this.elements.btnToggleConquistas.addEventListener('click', this.toggleConquistas.bind(this));
+        }
+        if (this.elements.btnToggleConquistasGame) {
+            this.elements.btnToggleConquistasGame.addEventListener('click', this.toggleConquistas.bind(this));
+        }
         
         if (this.elements.telaJogo) {
             this.elements.telaJogo.addEventListener('click', (event) => {
@@ -879,10 +929,6 @@ const Game = {
             });
         }
 
-        if (this.elements.btnToggleConquistas) {
-            this.elements.btnToggleConquistas.addEventListener('click', this.toggleConquistas.bind(this));
-        }
-
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space' && !e.target.closest('input, button')) {
                 e.preventDefault();
@@ -897,12 +943,12 @@ const Game = {
         this.atualizarVolume();
         if (this.elements.ultimaMensagemErro) this.elements.ultimaMensagemErro.textContent = this.settings.ultimaMensagemErro;
         this.renderizarConquistas();
-        this.carregarJogo(); // Carrega o jogo ao iniciar
-        this.atualizarExibicao(); // Garante que a UI reflita o estado carregado
+        this.carregarJogo();
+        this.atualizarExibicao();
     }
 };
 
-// O único evento global agora é o que inicia o jogo.
+// Inicializa o jogo quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', () => {
     Game.init();
 });
