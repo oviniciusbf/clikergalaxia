@@ -15,8 +15,11 @@
         <button id="iniciar-jogo-btn" class="btn btn-acao">Explorar o Universo</button>
 
         <!-- Menu de Conquistas na tela inicial -->
-        <button id="btnToggleConquistas" class="btn">Ver Conquistas</button>
-        <div id="conquistas-container" class="hidden"></div>
+        <button id="btnToggleConquistas" class="btn btn-toggle-conquistas">Ver Conquistas</button>
+        <div id="conquistas-container" class="hidden">
+            <h2>Conquistas</h2>
+            <div id="conquistas-lista"></div>
+        </div>
     </div>
 
     <div id="jogo" class="hidden">
@@ -31,12 +34,18 @@
                 <input type="range" id="volumeMaster" min="0" max="100" value="50">
                 <p id="ultimaMensagemErro">Nenhum erro recente.</p>
             </div>
-            <button id="btnToggleConquistasGame" class="btn btn-toggle-conquistas">Ver Conquistas</button>
-            <div id="conquistas-container-game" class="hidden">
-                <h2>Conquistas</h2>
-                <div id="conquistas-lista-game"></div>
-            </div>
             <div id="mensagem-salvar" class="hidden">Jogo Salvo!</div>
+        </div>
+
+        <!-- Botão de Conquistas no Jogo (FORA do painel-salvar) -->
+        <div style="text-align: center; margin: 20px 0;">
+            <button id="btnToggleConquistasGame" class="btn btn-toggle-conquistas">Ver Conquistas</button>
+        </div>
+
+        <!-- Container de Conquistas no Jogo (FORA do painel-salvar) -->
+        <div id="conquistas-container-game" class="hidden">
+            <h2>Conquistas</h2>
+            <div id="conquistas-lista-game"></div>
         </div>
 
         <!-- Título simplificado sem renda -->
@@ -85,3 +94,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
