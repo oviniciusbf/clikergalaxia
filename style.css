@@ -652,6 +652,9 @@ input[type="range"] {
 /* Estilos existentes... */
 }
 
+/* Estilos existentes... */
+}
+
 #conquistas-container-game h2 {
     text-align: center;
     color: var(--cor-titulo);
@@ -1000,5 +1003,6 @@ input[type="range"] {
 }
 
 /* Resto do CSS permanece igual... */
+
 
 
