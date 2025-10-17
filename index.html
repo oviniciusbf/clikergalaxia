@@ -26,15 +26,28 @@
         <div class="painel-salvar">
             <button id="btnSalvar" class="btn">Salvar Jogo</button>
             <button id="btnReiniciar" class="btn btn-reiniciar">Reiniciar Jogo</button>
-            <button id="btnToggleControleSom" class="btn btn-toggle-som">🔊 Controle de Som</button>
-            <div id="controle-som-container" class="controle-som hidden">
-                <button id="btnToggleSomGeral" class="btn btn-toggle-som">Som Ativado</button>
-                <button id="btnToggleSomFundo" class="btn btn-toggle-som">Som de Fundo Ativado</button>
-                <label for="volumeMaster">Volume Geral: <span id="volumeValor">50%</span></label>
+            <button id="btnToggleControleSom" class="btn btn-toggle-controle-som">🔊 Controle de Som</button>
+            <div id="mensagem-salvar" class="hidden">Jogo Salvo!</div>
+        </div>
+
+        <!-- NOVO CONTROLADOR DE SOM - Baseado no menu de conquistas -->
+        <div id="controle-som-container" class="controle-som hidden">
+            <h2>🎵 Controles de Áudio</h2>
+            
+            <div class="controle-item">
+                <button id="btnToggleSomGeral" class="btn btn-toggle-som">🔊 Som Ativado</button>
+                <button id="btnToggleSomFundo" class="btn btn-toggle-som">🎵 Som de Fundo Ativado</button>
+            </div>
+            
+            <div class="controle-volume">
+                <label for="volumeMaster">Volume Geral:</label>
                 <input type="range" id="volumeMaster" min="0" max="100" value="50">
+                <span id="volumeValor" class="volume-valor">50%</span>
+            </div>
+            
+            <div class="ultima-mensagem">
                 <p id="ultimaMensagemErro">Nenhum erro recente.</p>
             </div>
-            <div id="mensagem-salvar" class="hidden">Jogo Salvo!</div>
         </div>
 
         <!-- Botão de Conquistas no Jogo (FORA do painel-salvar) -->
@@ -94,4 +107,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
